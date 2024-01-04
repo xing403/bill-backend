@@ -17,4 +17,7 @@ public interface BillService extends IService<Bill> {
     IPage<Bill> findByUserIdAndDataTime(Page<Bill> page, Bill bill);
 
     Bill getByIdAndUserId(Long id, Long userId);
+
+    Long getBillCountByUserId(Long userId, String dataTime);
+    Double getBillSumByUserIdAndDataTimeAndType(Long userId, String dataTime, Integer type);
 }

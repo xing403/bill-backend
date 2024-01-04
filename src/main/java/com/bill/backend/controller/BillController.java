@@ -14,8 +14,9 @@ import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -64,29 +65,20 @@ public class BillController {
     }
 
     @RequestMapping("/delete")
-    public BaseResponse<Integer> deleteBill(@RequestHeader("Authorization") String token, @RequestBody Bill bill) {
+    public BaseResponse<Integer> deleteBill(@RequestHeader("Authorization") String token, @RequestParam("id") Long id) {
         User currentUser = userService.getCurrentUser(token);
 
-        Bill byId = billService.getById(bill.getId());
-        if (byId == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "未找到该账单");
+        if(id == null || id == 0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
         }
-        if (byId.getIsDelete() == 1) {
-            throw new BusinessException(ErrorCode.OPERATION_ERROR, "该账单已删除");
-        }
-        if (currentUser.getAuth().isEmpty() || currentUser.getAuth().equals("user") || !Objects.equals(currentUser.getId(), byId.getUserId())) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权限");
+        Bill bill = billService.getByIdAndUserId(id, currentUser.getId());
+
+        if (bill == null || bill.getIsDelete() == 1) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "未找到该账单或已被删除");
         }
 
         Integer i = billService.deleteBill(bill.getId());
         return ResultUtils.success(i, "删除成功");
-    }
-
-    @RequestMapping("/list")
-    public BaseResponse<List<Bill>> list(@RequestHeader("Authorization") String token) {
-        userService.getCurrentUser(token);
-        List<Bill> list = billService.list(null);
-        return ResultUtils.success(list);
     }
 
     @PostMapping("/listByUserIdAndDataTime")
@@ -119,7 +111,7 @@ public class BillController {
         return ResultUtils.success(map);
     }
 
-    @RequestMapping("/getById")
+    @PostMapping("/getById")
     public BaseResponse<Bill> listByUserId(@RequestHeader("Authorization") String token, @RequestParam("id") Long id) {
         User currentUser = userService.getCurrentUser(token);
 
@@ -135,5 +127,32 @@ public class BillController {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "未找到该账单");
 
         return ResultUtils.success(byIdAndUserId, "获取成功");
+    }
+
+    @GetMapping("/information")
+    public BaseResponse<Map<String, Object>> information(@RequestHeader("Authorization") String token) {
+        User currentUser = userService.getCurrentUser(token);
+
+        String currentMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        String lastMonth = LocalDate.now().minusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM"));
+
+        Long allBillCount = billService.getBillCountByUserId(currentUser.getId(), "");
+        Long cBillCount = billService.getBillCountByUserId(currentUser.getId(), currentMonth);
+
+
+        Double currentMonthBillIncomeSum = billService.getBillSumByUserIdAndDataTimeAndType(currentUser.getId(), currentMonth, 1);
+        Double currentMonthBillExpenseSum = billService.getBillSumByUserIdAndDataTimeAndType(currentUser.getId(), currentMonth, 2);
+        Double lastMonthBillIncomeSum = billService.getBillSumByUserIdAndDataTimeAndType(currentUser.getId(), lastMonth, 1);
+        Double lastMonthBillExpenseSum = billService.getBillSumByUserIdAndDataTimeAndType(currentUser.getId(), lastMonth, 2);
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("billCount", allBillCount);
+        map.put("cBillCount", cBillCount);
+        map.put("cBillIncome", currentMonthBillIncomeSum);
+        map.put("cBillExpense", currentMonthBillExpenseSum);
+        map.put("lBillIncome", lastMonthBillIncomeSum);
+        map.put("lBillExpense", lastMonthBillExpenseSum);
+
+        return ResultUtils.success(map, "获取成功");
     }
 }

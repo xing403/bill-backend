@@ -35,7 +35,7 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements Bi
 
     @Override
     public Integer deleteBill(Long id) {
-        return null;
+        return billMapper.delete(new UpdateWrapper<Bill>().eq("id", id));
     }
 
     @Override
@@ -53,5 +53,16 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements Bi
     @Override
     public Bill getByIdAndUserId(Long id, Long userId) {
         return billMapper.selectOne(new QueryWrapper<Bill>().eq("id", id).eq("user_Id", userId));
+    }
+
+    @Override
+    public Long getBillCountByUserId(Long userId, String dataTime) {
+        return billMapper.selectCount(new QueryWrapper<Bill>().eq("user_Id", userId).like("data_time", dataTime));
+    }
+
+    @Override
+    public Double getBillSumByUserIdAndDataTimeAndType(Long userId, String dataTime, Integer type) {
+        Double billSumByUserIdAndDataTimeAndType = billMapper.getBillSumByUserIdAndDataTimeAndType(userId, type, '%' + dataTime + '%');
+        return billSumByUserIdAndDataTimeAndType == null ? 0.0 : billSumByUserIdAndDataTimeAndType;
     }
 }

@@ -1,15 +1,14 @@
 package com.bill.backend.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.bill.backend.modules.constant.Setting;
-import com.google.code.kaptcha.Producer;
 import com.bill.backend.modules.BaseResponse;
 import com.bill.backend.modules.constant.ErrorCode;
+import com.bill.backend.modules.constant.Setting;
 import com.bill.backend.modules.dao.UserRequest;
 import com.bill.backend.modules.entity.User;
 import com.bill.backend.modules.exception.BusinessException;
 import com.bill.backend.service.UserService;
 import com.bill.backend.utils.*;
+import com.google.code.kaptcha.Producer;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.util.FastByteArrayOutputStream;
@@ -19,7 +18,9 @@ import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -154,10 +155,7 @@ public class UserController {
     @ApiOperation("更新用户信息")
     @PostMapping("/update")
     public BaseResponse<Boolean> update(@RequestHeader("Authorization") String token, @RequestBody User user) {
-        User self = JSON.parseObject(JSON.toJSONString(redisCacheUtils.getCache(token)), User.class);
-        if (self == null) {
-            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "未登录/无效请求");
-        }
+        User self = userService.getCurrentUser(token);
         Integer res;
         if ((self.getUsername().equals(user.getUsername())) ||
                 (self.getAuth().equals("root") && (user.getAuth().equals("admin") || user.getAuth().equals("user"))) ||
@@ -173,10 +171,8 @@ public class UserController {
     @ApiOperation("删除用户")
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestHeader("Authorization") String token, @RequestBody User u) {
-        User self = JSON.parseObject(JSON.toJSONString(redisCacheUtils.getCache(token)), User.class);
-        if (self == null) {
-            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "未登录/无效请求");
-        }
+        User self = userService.getCurrentUser(token);
+
         User user = userService.getByUsername(u.getUsername());
         if (user == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "删除用户不存在");
