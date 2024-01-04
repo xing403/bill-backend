@@ -1,0 +1,18 @@
+package com.bill.backend.service;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.bill.backend.modules.entity.Bill;
+import org.springframework.stereotype.Service;
+
+@Service
+public interface BillService extends IService<Bill> {
+    Boolean addBill(Bill bill);
+
+    Integer updateBill(Bill bill, Long id);
+
+    Integer deleteBill(Long id);
+
+    IPage<Bill> findByUserIdAndDataTime(Page<Bill> page, Bill bill);
+}
