@@ -29,12 +29,8 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements Bi
     }
 
     @Override
-    public Integer updateBill(Bill bill, Long id) {
-        UpdateWrapper<Bill> billUpdateWrapper = new UpdateWrapper<>();
-        billUpdateWrapper.eq("user_Id", id)
-                .eq("id", bill.getId());
-        return billMapper.update(bill, billUpdateWrapper);
-
+    public Integer updateBill(Bill bill) {
+        return billMapper.updateById(bill);
     }
 
     @Override
@@ -49,8 +45,13 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements Bi
             billQueryWrapper.eq("user_Id", bill.getUserId());
         }
         if (bill.getDataTime() != null) {
-            billQueryWrapper.like("data_time", bill.getDataTime() + "-%");
+            billQueryWrapper.like("data_time", bill.getDataTime());
         }
         return billMapper.selectPage(page, billQueryWrapper);
+    }
+
+    @Override
+    public Bill getByIdAndUserId(Long id, Long userId) {
+        return billMapper.selectOne(new QueryWrapper<Bill>().eq("id", id).eq("user_Id", userId));
     }
 }

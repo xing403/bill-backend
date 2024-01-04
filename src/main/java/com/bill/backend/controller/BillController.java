@@ -43,11 +43,24 @@ public class BillController {
     }
 
     @RequestMapping("/update")
-    public Integer updateBill(@RequestHeader("Authorization") String token, @RequestBody Bill bill) {
-        userService.getCurrentUser(token);
+    public BaseResponse<Integer> updateBill(@RequestHeader("Authorization") String token, @RequestBody Bill bill) {
+        User currentUser = userService.getCurrentUser(token);
+        if (bill.getId() == null || bill.getId() == 0)
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
 
+        if (currentUser.getAuth().isEmpty() || currentUser.getAuth().equals("user") ||!Objects.equals(currentUser.getId(), bill.getUserId()))
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权限");
 
-        return billService.updateBill(bill, bill.getId());
+        Bill byIdAndUserId = billService.getByIdAndUserId(bill.getId(), currentUser.getId());
+
+        if(byIdAndUserId == null)
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "未找到该账单");
+
+        Integer i = billService.updateBill(bill);
+
+        if( i == 0)
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "更新失败");
+        return ResultUtils.success(i, "更新成功");
     }
 
     @RequestMapping("/delete")
@@ -104,5 +117,23 @@ public class BillController {
         map.put("size", byUserIdAndDataTime.getSize());
 
         return ResultUtils.success(map);
+    }
+
+    @RequestMapping("/getById")
+    public BaseResponse<Bill> listByUserId(@RequestHeader("Authorization") String token, @RequestParam("id") Long id) {
+        User currentUser = userService.getCurrentUser(token);
+
+        if (currentUser.getAuth().isEmpty())
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权限");
+
+        if (id == null || id < 0)
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+
+        Bill byIdAndUserId = billService.getByIdAndUserId(id, currentUser.getId());
+
+        if (byIdAndUserId == null)
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "未找到该账单");
+
+        return ResultUtils.success(byIdAndUserId, "获取成功");
     }
 }

@@ -10,9 +10,11 @@ import org.springframework.stereotype.Service;
 public interface BillService extends IService<Bill> {
     Boolean addBill(Bill bill);
 
-    Integer updateBill(Bill bill, Long id);
+    Integer updateBill(Bill bill);
 
     Integer deleteBill(Long id);
 
     IPage<Bill> findByUserIdAndDataTime(Page<Bill> page, Bill bill);
+
+    Bill getByIdAndUserId(Long id, Long userId);
 }
