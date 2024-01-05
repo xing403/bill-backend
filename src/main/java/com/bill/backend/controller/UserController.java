@@ -1,5 +1,9 @@
 package com.bill.backend.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.bill.backend.modules.constant.Setting;
+import com.google.code.kaptcha.Producer;
 import com.bill.backend.modules.BaseResponse;
 import com.bill.backend.modules.constant.ErrorCode;
 import com.bill.backend.modules.constant.Setting;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
@@ -33,6 +38,8 @@ public class UserController {
     private Producer captchaProducerMath;
     @Resource
     private RedisCacheUtils redisCacheUtils;
+    @Resource
+    private HttpServletRequest request;
 
 
     @ApiOperation("获取用户信息")
@@ -47,16 +54,42 @@ public class UserController {
     }
 
     @ApiOperation("获取用户列表")
-    @GetMapping("/list")
-    public BaseResponse<List<User>> list(@RequestHeader("Authorization") String token) {
+    @PostMapping("/list")
+    public BaseResponse<Map<String, Object>> list(
+            @RequestHeader("Authorization") String token,
+            @RequestParam("page") Long pageNum,
+            @RequestParam("pageSize") Integer pageSize) {
 
         User self = userService.getCurrentUser(token);
 
-        if (self.getAuth().equals("user")) {
+        if (self.getAuth().equals("user"))
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权限");
+
+        if (pageNum == null || pageNum < 1)
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "页码错误");
+
+        if (pageSize == null || pageSize < 1)
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "页大小错误");
+
+        Page<User> userPage = new Page<>(pageNum, pageSize);
+        IPage<User> list = userService.list(self.getAuth(), userPage);
+        List<User> users = list.getRecords();
+
+        for (User user : users) {
+            if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
+                user.setAvatar(FileUtils.fileCompletePath(request, "", user.getAvatar()));
+            } else {
+                user.setAvatar("");
+            }
         }
-        List<User> users = userService.list(self.getAuth());
-        return ResultUtils.success(users, "");
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("total", list.getTotal());
+        map.put("list", users);
+        map.put("page", pageNum);
+        map.put("pageSize", pageSize);
+
+        return ResultUtils.success(map, "查询成功");
     }
 
     @ApiOperation("注册")
@@ -123,6 +156,12 @@ public class UserController {
     @ApiOperation("获取用户信息")
     @GetMapping("/logout")
     public BaseResponse<Boolean> logout(@RequestHeader("Authorization") String token) {
+        User self = userService.getCurrentUser(token);
+
+        if (self == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "用户已退出");
+        }
+
         redisCacheUtils.delete(token);
         return ResultUtils.success(true, "退出成功");
     }

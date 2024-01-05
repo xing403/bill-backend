@@ -6,6 +6,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.bill.backend.modules.entity.Bill;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+
 @Service
 public interface BillService extends IService<Bill> {
     Boolean addBill(Bill bill);
@@ -20,4 +23,7 @@ public interface BillService extends IService<Bill> {
 
     Long getBillCountByUserId(Long userId, String dataTime);
     Double getBillSumByUserIdAndDataTimeAndType(Long userId, String dataTime, Integer type);
+    List<Map<String, Object>> getIncomeAndExpenseByMonth(String dataTime, Long userId);
+    List<Map<String, Object>> getIncomeAndExpenseByYear(String dataTime, Long userId);
+
 }

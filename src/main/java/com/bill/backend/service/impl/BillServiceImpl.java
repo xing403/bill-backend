@@ -1,7 +1,6 @@
 package com.bill.backend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -13,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements BillService {
@@ -64,5 +65,12 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements Bi
     public Double getBillSumByUserIdAndDataTimeAndType(Long userId, String dataTime, Integer type) {
         Double billSumByUserIdAndDataTimeAndType = billMapper.getBillSumByUserIdAndDataTimeAndType(userId, type, '%' + dataTime + '%');
         return billSumByUserIdAndDataTimeAndType == null ? 0.0 : billSumByUserIdAndDataTimeAndType;
+    public List<Map<String, Object>> getIncomeAndExpenseByMonth(String dataTime, Long userId) {
+        return billMapper.getIncomeAndExpenseByMonth(dataTime + "-__", userId);
+    }
+
+    @Override
+    public List<Map<String, Object>> getIncomeAndExpenseByYear(String dataTime, Long userId) {
+        return billMapper.getIncomeAndExpenseByYear(dataTime + "-__-__", userId);
     }
 }
