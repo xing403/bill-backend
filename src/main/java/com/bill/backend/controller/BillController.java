@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -49,17 +50,17 @@ public class BillController {
         if (bill.getId() == null || bill.getId() == 0)
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
 
-        if (currentUser.getAuth().isEmpty() || currentUser.getAuth().equals("user") ||!Objects.equals(currentUser.getId(), bill.getUserId()))
+        if (currentUser.getAuth().isEmpty() || currentUser.getAuth().equals("user") || !Objects.equals(currentUser.getId(), bill.getUserId()))
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权限");
 
         Bill byIdAndUserId = billService.getByIdAndUserId(bill.getId(), currentUser.getId());
 
-        if(byIdAndUserId == null)
+        if (byIdAndUserId == null)
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "未找到该账单");
 
         Integer i = billService.updateBill(bill);
 
-        if( i == 0)
+        if (i == 0)
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "更新失败");
         return ResultUtils.success(i, "更新成功");
     }
@@ -68,7 +69,7 @@ public class BillController {
     public BaseResponse<Integer> deleteBill(@RequestHeader("Authorization") String token, @RequestParam("id") Long id) {
         User currentUser = userService.getCurrentUser(token);
 
-        if(id == null || id == 0){
+        if (id == null || id == 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
         }
         Bill bill = billService.getByIdAndUserId(id, currentUser.getId());
@@ -154,24 +155,29 @@ public class BillController {
         map.put("lBillExpense", lastMonthBillExpenseSum);
 
         return ResultUtils.success(map, "获取成功");
+    }
+
     @PostMapping("/incomeAndExpenseByMonth")
-    public BaseResponse<List<Map<String, Object>>> getDetailByMonth(@RequestHeader("Authorization") String token, @RequestParam("dataTime") String dataTime) {
+    public BaseResponse<List<Map<String, Object>>> getDetailByMonth(@RequestHeader("Authorization") String
+                                                                            token, @RequestParam("dataTime") String dataTime) {
         User currentUser = userService.getCurrentUser(token);
-        if(dataTime == null || dataTime.isEmpty())
+        if (dataTime == null || dataTime.isEmpty())
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
-        if(!dataTime.matches("^\\d{4}-\\d{2}$"))
+        if (!dataTime.matches("^\\d{4}-\\d{2}$"))
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
 
         List<Map<String, Object>> incomeAndExpenseByMonth = billService.getIncomeAndExpenseByMonth(dataTime, currentUser.getId());
         return ResultUtils.success(incomeAndExpenseByMonth, "获取成功");
     }
+
     @PostMapping("/incomeAndExpenseByYear")
-    public BaseResponse<List<Map<String, Object>>> getIncomeAndExpenseByYear(@RequestHeader("Authorization") String token, @RequestParam("dataTime") String dataTime) {
+    public BaseResponse<List<Map<String, Object>>> getIncomeAndExpenseByYear(@RequestHeader("Authorization") String
+                                                                                     token, @RequestParam("dataTime") String dataTime) {
         User currentUser = userService.getCurrentUser(token);
-        if(dataTime == null || dataTime.isEmpty())
+        if (dataTime == null || dataTime.isEmpty())
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
 
-        if(!dataTime.matches("^\\d{4}$"))
+        if (!dataTime.matches("^\\d{4}$"))
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
 
         List<Map<String, Object>> incomeAndExpenseByMonth = billService.getIncomeAndExpenseByYear(dataTime, currentUser.getId());
