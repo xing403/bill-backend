@@ -2,8 +2,6 @@ package com.bill.backend.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.bill.backend.modules.constant.Setting;
-import com.google.code.kaptcha.Producer;
 import com.bill.backend.modules.BaseResponse;
 import com.bill.backend.modules.constant.ErrorCode;
 import com.bill.backend.modules.constant.Setting;
@@ -209,10 +207,13 @@ public class UserController {
 
     @ApiOperation("删除用户")
     @PostMapping("/delete")
-    public BaseResponse<Boolean> deleteUser(@RequestHeader("Authorization") String token, @RequestBody User u) {
+    public BaseResponse<Boolean> deleteUser(@RequestHeader("Authorization") String token, @RequestParam("username") String username) {
         User self = userService.getCurrentUser(token);
 
-        User user = userService.getByUsername(u.getUsername());
+        if(username == null || username.isEmpty())
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+
+        User user = userService.getByUsername(username);
         if (user == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "删除用户不存在");
         }
@@ -251,5 +252,22 @@ public class UserController {
         map.put("uuid", uuid);
         map.put("img", Base64Utils.encode(os.toByteArray()));
         return ResultUtils.success(map, "");
+    }
+    @ApiOperation("获取用户")
+    @PostMapping("/getUser")
+    public BaseResponse<User> get(@RequestHeader("Authorization") String token, @RequestParam("id") Long id) {
+        User self = userService.getCurrentUser(token);
+        User byId = userService.getById(id);
+
+        if(byId==null)
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "用户不存在");
+        if ((self.getUsername().equals(byId.getUsername())) ||
+                (self.getAuth().equals("root") && (byId.getAuth().equals("admin") || byId.getAuth().equals("user"))) ||
+                self.getAuth().equals("admin") && byId.getAuth().equals("user")
+        ) {
+            return ResultUtils.success(byId, "获取成功");
+        } else {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有获取权限");
+        }
     }
 }
