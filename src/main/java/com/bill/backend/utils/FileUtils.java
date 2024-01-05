@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.URL;
 
 public class FileUtils {
+
     public static String upload(HttpServletRequest request, MultipartFile file) {
         String fileName = UUIDUtil.get32UUID();
         String dirPath = ClassUtils.getDefaultClassLoader().getResource("").getPath() + "static/file/";

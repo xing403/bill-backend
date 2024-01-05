@@ -3,6 +3,8 @@ package com.bill.backend.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bill.backend.service.UserService;
 import com.bill.backend.utils.FileUtils;
@@ -17,7 +19,6 @@ import com.bill.backend.modules.exception.BusinessException;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.List;
 
 
 @Service
@@ -74,7 +75,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
 
     @Override
-    public List<User> list(String auth) {
+    public IPage<User> list(String auth, Page<User> page) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         ArrayList<String> auths = new ArrayList<>();
         auths.add("admin");
@@ -82,25 +83,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (auth.equals("root")) {
             auths.add("root");
         }
+
         userQueryWrapper.in("auth", auths);
 
-        List<User> users = userMapper.selectList(userQueryWrapper);
 
-        users.forEach(user -> {
-            if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
-                user.setAvatar(FileUtils.fileCompletePath(request, "", user.getAvatar()));
-            }else{
-                user.setAvatar("");
-            }
-        });
-        return users;
+        return userMapper.selectPage(page, userQueryWrapper);
     }
 
     @Override
     public User getCurrentUser(String token) {
 
         User user = JSON.parseObject(JSON.toJSONString(redisCacheUtils.getCache(token)), User.class);
-        if (user == null){
+        if (user == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "token已过期");
         }
         return user;
@@ -132,7 +126,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
 
         userUpdateWrapper.set("password", UserUtils.encodePassword(newPassword))
-                        .eq("username", username);
+                .eq("username", username);
 
         return userMapper.update(null, userUpdateWrapper);
 
