@@ -13,8 +13,15 @@ public interface BillMapper extends BaseMapper<Bill> {
 
     @Select("SELECT data_time, " +
             "SUM(CASE WHEN `type` = 1 THEN `amount` ELSE 0 END) AS income, " +
-            "SUM(CASE WHEN `TYPE` = 2 THEN `amount` ELSE 0 END) AS expense, " +
-            "SUM(CASE WHEN `TYPE` = 1 THEN `amount` ELSE -1 * amount END) AS daySum " +
+            "SUM(CASE WHEN `type` = 2 THEN `amount` ELSE 0 END) AS expense, " +
+            "SUM(CASE WHEN `type` = 1 THEN `amount` ELSE -1 * amount END) AS daySum " +
             "FROM `bill` WHERE `data_time` LIKE #{dataTime} AND `user_id` = #{userId} AND `is_delete` = 0 GROUP BY `data_time`")
     List<Map<String, Object>> getIncomeAndExpenseByMonth(String dataTime, Long userId);
+
+    @Select("SELECT MONTH(data_time) AS `month`, " +
+            "SUM(CASE WHEN `type` = 1 THEN `amount` ELSE 0 END) AS income, " +
+            "SUM(CASE WHEN `type` = 2 THEN `amount` ELSE 0 END) AS expense, " +
+            "SUM(CASE WHEN `type` = 1 THEN `amount` ELSE -1 * amount END) AS monthSum " +
+            "FROM bill WHERE data_time LIKE #{dataTime} AND `user_id` = #{userId} AND `is_delete` = 0 GROUP BY MONTH(data_time)")
+    List<Map<String, Object>> getIncomeAndExpenseByYear(String dataTime, Long userId);
 }

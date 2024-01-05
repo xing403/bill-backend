@@ -58,6 +58,11 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements Bi
 
     @Override
     public List<Map<String, Object>> getIncomeAndExpenseByMonth(String dataTime, Long userId) {
-        return billMapper.getIncomeAndExpenseByMonth(dataTime + "-%", userId);
+        return billMapper.getIncomeAndExpenseByMonth(dataTime + "-__", userId);
+    }
+
+    @Override
+    public List<Map<String, Object>> getIncomeAndExpenseByYear(String dataTime, Long userId) {
+        return billMapper.getIncomeAndExpenseByYear(dataTime + "-__-__", userId);
     }
 }
