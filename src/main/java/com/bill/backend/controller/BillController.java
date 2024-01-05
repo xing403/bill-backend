@@ -82,13 +82,6 @@ public class BillController {
         return ResultUtils.success(i, "删除成功");
     }
 
-    @RequestMapping("/list")
-    public BaseResponse<List<Bill>> list(@RequestHeader("Authorization") String token) {
-        userService.getCurrentUser(token);
-        List<Bill> list = billService.list(null);
-        return ResultUtils.success(list);
-    }
-
     @PostMapping("/listByUserIdAndDataTime")
     public BaseResponse<Map<String, Object>> listByUserIdAndDataTime(
             @RequestHeader("Authorization") String token,
@@ -135,5 +128,15 @@ public class BillController {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "未找到该账单");
 
         return ResultUtils.success(byIdAndUserId, "获取成功");
+    }
+
+    @PostMapping("/incomeAndExpenseByMonth")
+    public BaseResponse<List<Map<String, Object>>> getDetailByMonth(@RequestHeader("Authorization") String token, @RequestParam("dataTime") String dataTime) {
+        User currentUser = userService.getCurrentUser(token);
+        if(dataTime == null || dataTime.isEmpty())
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+
+        List<Map<String, Object>> incomeAndExpenseByMonth = billService.getIncomeAndExpenseByMonth(dataTime, currentUser.getId());
+        return ResultUtils.success(incomeAndExpenseByMonth, "获取成功");
     }
 }
