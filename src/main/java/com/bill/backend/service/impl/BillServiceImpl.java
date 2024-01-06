@@ -49,6 +49,7 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements Bi
         if (bill.getDataTime() != null) {
             billQueryWrapper.like("data_time", bill.getDataTime());
         }
+        billQueryWrapper.orderByAsc("data_time");
         return billMapper.selectPage(page, billQueryWrapper);
     }
 
@@ -74,5 +75,9 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements Bi
     @Override
     public List<Map<String, Object>> getIncomeAndExpenseByYear(String dataTime, Long userId) {
         return billMapper.getIncomeAndExpenseByYear(dataTime + "-__-__", userId);
+    }
+    public
+    List<Map<String, Object>> getIncomeAndExpenseByDay(String dataTime, Long userId) {
+        return billMapper.getIncomeAndExpenseByDay(dataTime + "-__-__", userId);
     }
 }

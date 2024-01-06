@@ -25,5 +25,7 @@ public interface BillService extends IService<Bill> {
     Double getBillSumByUserIdAndDataTimeAndType(Long userId, String dataTime, Integer type);
     List<Map<String, Object>> getIncomeAndExpenseByMonth(String dataTime, Long userId);
     List<Map<String, Object>> getIncomeAndExpenseByYear(String dataTime, Long userId);
+    List<Map<String, Object>> getIncomeAndExpenseByDay(String dataTime, Long userId);
+
 
 }

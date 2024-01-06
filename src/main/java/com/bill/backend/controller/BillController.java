@@ -183,4 +183,18 @@ public class BillController {
         List<Map<String, Object>> incomeAndExpenseByMonth = billService.getIncomeAndExpenseByYear(dataTime, currentUser.getId());
         return ResultUtils.success(incomeAndExpenseByMonth, "获取成功");
     }
+
+    @PostMapping("/incomeAndExpenseByDay")
+    public BaseResponse<List<Map<String, Object>>> getIncomeAndExpenseByDay(@RequestHeader("Authorization") String token, @RequestParam("dataTime") String dataTime) {
+        User currentUser = userService.getCurrentUser(token);
+        if (dataTime == null || dataTime.isEmpty())
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+
+        if (!dataTime.matches("^\\d{4}$"))
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+
+        List<Map<String, Object>> incomeAndExpenseByMonth = billService.getIncomeAndExpenseByDay(dataTime, currentUser.getId());
+        return ResultUtils.success(incomeAndExpenseByMonth, "获取成功");
+    }
+
 }
