@@ -270,4 +270,33 @@ public class UserController {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有获取权限");
         }
     }
+
+    @ApiOperation("忘记密码")
+    @PostMapping("/forgetPassword")
+    public BaseResponse<Boolean> forgetPassword(@RequestBody UserRequest userRequest) {
+
+        String uuid = userRequest.getUuid();
+        if (!redisCacheUtils.hasKey(uuid))
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "验证码已过期");
+
+        String code = userRequest.getCode();
+        if (!redisCacheUtils.getCache(uuid).equals(code))
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "验证码错误");
+
+        if(userRequest.getUsername().isEmpty() || userRequest.getCheck().isEmpty() || userRequest.getNewPassword().isEmpty())
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+
+        User user = userService.getByUsername(userRequest.getUsername());
+
+        if (user == null || !(user.getPhone().equals(userRequest.getCheck()) || user.getEmail().equals(userRequest.getCheck())))
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "用户不存在或手机号/邮箱错误");
+
+        if (UserUtils.encodePassword(userRequest.getNewPassword()).equals(user.getPassword()))
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "新密码与旧密码相同");
+
+        Integer i = userService.updatePassword(user.getUsername(), userRequest.getNewPassword());
+
+        return i > 0? ResultUtils.success(true, "修改成功") : ResultUtils.error(ErrorCode.SYSTEM_ERROR, "修改失败");
+
+    }
 }
