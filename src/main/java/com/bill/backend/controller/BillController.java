@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @Api(tags = "账单")
@@ -40,6 +37,9 @@ public class BillController {
         if (currentUser.getAuth().isEmpty()) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权限");
         }
+        bill.setUserId(currentUser.getId());
+        bill.setCreateTime(new Date());
+        bill.setUpdateTime(new Date());
         Boolean b = billService.addBill(bill);
         return ResultUtils.success(b, "添加成功");
     }
@@ -57,7 +57,7 @@ public class BillController {
 
         if (byIdAndUserId == null)
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "未找到该账单");
-
+        bill.setUpdateTime(new Date());
         Integer i = billService.updateBill(bill);
 
         if (i == 0)
@@ -77,7 +77,7 @@ public class BillController {
         if (bill == null || bill.getIsDelete() == 1) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "未找到该账单或已被删除");
         }
-
+        bill.setUpdateTime(new Date());
         Integer i = billService.deleteBill(bill.getId());
         return ResultUtils.success(i, "删除成功");
     }

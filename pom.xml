@@ -10,6 +10,7 @@
     </parent>
     <groupId>com.bill</groupId>
     <artifactId>backend</artifactId>
+    <version>0.1.4</version>
     <packaging>jar</packaging>
 
     <name>backend</name>
