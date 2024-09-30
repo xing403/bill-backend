@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@TableName("bill")
+@TableName("x_bill")
 public class BillEntity extends BaseEntity {
     /**
      * 账单编号

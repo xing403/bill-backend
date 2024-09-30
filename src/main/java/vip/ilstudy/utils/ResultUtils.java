@@ -9,7 +9,7 @@ import java.io.Serializable;
  * 响应体类
  */
 @Data
-public class ResultUtil implements Serializable {
+public class ResultUtils implements Serializable {
     /**
      * 响应成功
      */

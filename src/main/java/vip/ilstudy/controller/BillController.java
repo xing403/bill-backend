@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import vip.ilstudy.entity.BillEntity;
 import vip.ilstudy.entity.ResultEntity;
 import vip.ilstudy.entity.TablePageEntity;
-import vip.ilstudy.utils.ResultUtil;
+import vip.ilstudy.utils.ResultUtils;
 import vip.ilstudy.service.BillService;
 
 @RestController
@@ -28,7 +28,7 @@ public class BillController extends BaseController {
     @GetMapping("{billId}")
     public ResultEntity<BillEntity> getBillById(@PathVariable("billId") Long billId) {
         BillEntity billById = billService.getBillById(billId);
-        return ResultUtil.success(billById);
+        return ResultUtils.success(billById);
     }
 
     /**
@@ -46,15 +46,15 @@ public class BillController extends BaseController {
         }
         IPage<BillEntity> billListPage = billService.getBillListPage(pageNum, pageSize);
 
-        return ResultUtil.success(new TablePageEntity<>(billListPage));
+        return ResultUtils.success(new TablePageEntity<>(billListPage));
     }
 
     @PostMapping("")
     public ResultEntity<Boolean> addBill(@Valid @RequestBody BillEntity billEntity) {
         Integer res = billService.insertBill(billEntity);
         if (res > 0) {
-            return ResultUtil.success();
+            return ResultUtils.success();
         }
-        return ResultUtil.error(500, "添加失败");
+        return ResultUtils.error(500, "添加失败");
     }
 }

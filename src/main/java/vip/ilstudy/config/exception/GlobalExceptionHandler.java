@@ -8,12 +8,14 @@ import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import vip.ilstudy.entity.ResultEntity;
-import vip.ilstudy.utils.ResultUtil;
+import vip.ilstudy.utils.ResultUtils;
 
 import java.util.Objects;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-     Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     /**
      * 校验参数异常处理
      *
@@ -24,7 +26,7 @@ public class GlobalExceptionHandler {
     public ResultEntity<?> MethodArgumentNotValidException(MethodArgumentNotValidException e) {
         String message = Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage();
         log.error(message);
-        return ResultUtil.error(message);
+        return ResultUtils.error(message);
     }
 
     /**
@@ -35,11 +37,19 @@ public class GlobalExceptionHandler {
         String requestURI = request.getRequestURI();
 
         log.error(String.format("请求路径中缺少必需的路径变量[%s]", e.getVariableName()));
-        return ResultUtil.error(String.format("请求路径中缺少必需的路径变量[%s]", e.getVariableName()));
+        return ResultUtils.error(String.format("请求路径中缺少必需的路径变量[%s]", e.getVariableName()));
     }
+
+    /**
+     * 运行异常
+     *
+     * @param e
+     * @return
+     */
     @ExceptionHandler(RuntimeException.class)
     public ResultEntity doHandleRuntimeException(RuntimeException e) {
         log.error("系统异常");
-        return ResultUtil.error("系统异常");
+        e.printStackTrace();
+        return ResultUtils.error("系统异常");
     }
 }
