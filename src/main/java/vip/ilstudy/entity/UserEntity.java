@@ -3,6 +3,7 @@ package vip.ilstudy.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,6 +30,7 @@ public class UserEntity extends BaseEntity {
     /**
      * 密码
      */
+    @JsonIgnore
     @NotBlank(message = "密码不能为空")
     private String password;
 }

@@ -25,6 +25,7 @@ import vip.ilstudy.service.RedisCacheService;
 import vip.ilstudy.service.TokenService;
 import vip.ilstudy.utils.JwtTokenUtils;
 import vip.ilstudy.utils.ResultUtils;
+import vip.ilstudy.utils.ServletUtils;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -61,9 +62,6 @@ public class AuthenticationContextHandler extends SimpleUrlAuthenticationFailure
         String token = tokenService.generateToken(loginUserEntity);
         //存放token到cookie中，最好时直接返回json
 //        JwtTokenUtils.setCookieToken(response, token);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        String jsonString = JSON.toJSONString(ResultUtils.success(token));
         // token 与 loginUserEntity 记录到redis 中
 
         redisCacheService.setCacheObject(
@@ -75,7 +73,8 @@ public class AuthenticationContextHandler extends SimpleUrlAuthenticationFailure
 
         log.info("用户 {} 登录成功", loginUserEntity.getUsername());
 
-        response.getWriter().write(jsonString);
+        String jsonString = JSON.toJSONString(ResultUtils.success(token));
+        ServletUtils.renderString(response, jsonString);
     }
 
     /**
@@ -105,10 +104,8 @@ public class AuthenticationContextHandler extends SimpleUrlAuthenticationFailure
         assert exception != null;
         log.error("登录异常：{}", exception.getMessage());
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
         String jsonString = JSON.toJSONString(ResultUtils.error(message));
-        response.getWriter().write(jsonString);
+        ServletUtils.renderString(response, jsonString);
     }
 
     /**

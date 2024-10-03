@@ -45,12 +45,14 @@ public class LoginUserService implements UserDetailsService {
         LoginUserEntity loginUserEntity = new LoginUserEntity();
         loginUserEntity.setUsername(userEntityByUsername.getUsername());
         loginUserEntity.setPassword(userEntityByUsername.getPassword());
+        loginUserEntity.setUserEntity(userEntityByUsername);
 
         return loginUserEntity;
     }
 
     /**
      * 获取用户信息
+     *
      * @param request
      * @return
      */

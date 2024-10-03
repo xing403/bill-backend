@@ -20,6 +20,7 @@ import vip.ilstudy.service.LoginUserService;
 import vip.ilstudy.service.TokenService;
 import vip.ilstudy.utils.JwtTokenUtils;
 import vip.ilstudy.utils.ResultUtils;
+import vip.ilstudy.utils.ServletUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -36,10 +37,6 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
         String requestUri = request.getRequestURI();
 
         if (Arrays.asList(Constant.WRITE_PATH).contains(requestUri)) {
@@ -47,7 +44,7 @@ public class SecurityFilter extends OncePerRequestFilter {
             return;
         } else if (Arrays.asList(Constant.BLACK_PATH).contains(requestUri)) {
             String jsonString = JSON.toJSONString(ResultUtils.error("无权限访问"));
-            response.sendError(500, jsonString);
+            ServletUtils.renderString(response, jsonString);
             return;
         }
 
@@ -55,20 +52,20 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (StringUtils.isEmpty(token)) {
             log.error("token 为空");
             String jsonString = JSONObject.toJSONString(ResultUtils.error("未登录"));
-            response.getWriter().write(jsonString);
+            ServletUtils.renderString(response, jsonString);
             return;
         }
-            try {
-                tokenService.verifyToken(request);
-                LoginUserEntity loginUser = loginUserService.getLoginUser(request);
-                log.info("用户 {} 登录成功", loginUser.getUsername());
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                filterChain.doFilter(request, response);
-            } catch (Exception e) {
-                String jsonString = JSON.toJSONString(ResultUtils.error("无权限访问"));
-                response.getWriter().write(jsonString);
-            }
+        try {
+            tokenService.verifyToken(request);
+            LoginUserEntity loginUser = loginUserService.getLoginUser(request);
+            log.info("用户 {} 登录成功", loginUser.getUsername());
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            String jsonString = JSON.toJSONString(ResultUtils.error("无权限访问"));
+            ServletUtils.renderString(response, jsonString);
+        }
 
     }
 
