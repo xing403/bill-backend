@@ -83,19 +83,10 @@ public class SecurityConfig {
                                 // 访问拒绝处理器 handle
                                 .accessDeniedHandler(authenticationContextHandler)
                 )
-                //  设置 controller 权限
                 .authorizeHttpRequests(authorizeHttpRequest -> authorizeHttpRequest
                                 .requestMatchers("/login", "/register").anonymous()
-                                //  允许直接访问 授权登录接口
-//                        .requestMatchers(HttpMethod.POST, "/web/authenticate").permitAll()
-                                //  允许 SpringMVC 的默认错误地址匿名访问
-//                        .requestMatchers("/error").permitAll()
-                                //  其他所有接口必须有Authority信息，Authority在登录成功后的UserDetailImpl对象中默认设置“ROLE_USER”
-                                //.requestMatchers("/**").hasAnyAuthority("ROLE_USER")
-//                        .requestMatchers("/heartBeat/**", "/main/**").permitAll()
-                                //  允许任意请求被已登录用户访问，不检查Authority
                                 .requestMatchers("/**").permitAll()
-                                .anyRequest().authenticated()
+//                                .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

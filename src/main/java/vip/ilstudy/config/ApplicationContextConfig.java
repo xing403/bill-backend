@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ApplicationContextConfig implements InitializingBean,  ApplicationContextAware {
+public class ApplicationContextConfig implements InitializingBean, ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
     @Override

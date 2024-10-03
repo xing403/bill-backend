@@ -64,9 +64,9 @@ public class SecurityFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             String jsonString = JSON.toJSONString(ResultUtils.error("无权限访问"));
+            log.error(jsonString);
             ServletUtils.renderString(response, jsonString);
         }
 
     }
-
 }

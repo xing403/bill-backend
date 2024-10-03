@@ -89,20 +89,16 @@ public class AuthenticationContextHandler extends SimpleUrlAuthenticationFailure
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         String username = request.getParameter("username");
-        String message;
-        if (exception != null) {
-            message = String.format("用户 %s 不存在", username);
-        } else if (exception instanceof LockedException) {
+
+        String message = String.format("用户 %s 不存在", username);
+
+        if (exception instanceof LockedException) {
             message = String.format("用户 %s 被冻结", username);
         } else if (exception instanceof BadCredentialsException) {
             message = "用户名或密码错误";
-        } else {
-            message = "登录验证失败，其他登录失败错误";
         }
-        log.error("登录异常：{}", message);
 
-        assert exception != null;
-        log.error("登录异常：{}", exception.getMessage());
+        log.error("登录异常：{}", message);
 
         String jsonString = JSON.toJSONString(ResultUtils.error(message));
         ServletUtils.renderString(response, jsonString);
