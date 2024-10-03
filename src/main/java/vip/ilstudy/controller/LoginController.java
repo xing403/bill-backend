@@ -18,12 +18,22 @@ public class LoginController extends BaseController {
     @Autowired
     private UserService userService;
 
+    /**
+     * 登录 (该路由 并未执行，而是直接进行登录校验)
+     * @param loginUser
+     * @return
+     */
     @PostMapping("/login")
     public ResultEntity<Boolean> login(@Valid @RequestBody LoginUserEntity loginUser) {
 
         return ResultUtils.success(true);
     }
 
+    /**
+     * 用户注册
+     * @param loginUser
+     * @return
+     */
     @PostMapping("/register")
     public ResultEntity<Boolean> register(@Valid @RequestBody LoginUserEntity loginUser) {
         Integer i = userService.insertUser(loginUser);

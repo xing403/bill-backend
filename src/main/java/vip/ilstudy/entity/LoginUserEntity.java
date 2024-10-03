@@ -5,6 +5,7 @@ import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
 
@@ -14,6 +15,9 @@ import java.util.List;
  */
 @Data
 public class LoginUserEntity implements UserDetails {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
     /**
      * 用户名
      */

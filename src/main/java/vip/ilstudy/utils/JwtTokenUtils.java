@@ -1,17 +1,12 @@
 package vip.ilstudy.utils;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import vip.ilstudy.entity.LoginUserEntity;
+import vip.ilstudy.config.Constant;
 import vip.ilstudy.service.TokenService;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Token 工具类
@@ -28,7 +23,11 @@ public class JwtTokenUtils {
      * @return
      */
     public static String getToken(HttpServletRequest request) {
-        return request.getHeader("Authorization");
+        String token = request.getHeader("Authorization");
+        if (StringUtils.isNotEmpty(token) && token.startsWith(Constant.TOKEN_PREFIX)) {
+            token = token.replace(Constant.TOKEN_PREFIX, "");
+        }
+        return token;
     }
 
     /**

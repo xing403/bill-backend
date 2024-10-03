@@ -19,14 +19,15 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
+import vip.ilstudy.config.Constant;
 import vip.ilstudy.entity.LoginUserEntity;
-import vip.ilstudy.entity.ResultEntity;
+import vip.ilstudy.service.RedisCacheService;
 import vip.ilstudy.service.TokenService;
 import vip.ilstudy.utils.JwtTokenUtils;
 import vip.ilstudy.utils.ResultUtils;
 
-import java.io.EOFException;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 认证上下文处理
@@ -41,8 +42,11 @@ public class AuthenticationContextHandler extends SimpleUrlAuthenticationFailure
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private RedisCacheService redisCacheService;
+
     /**
-     * 鉴权成功处理
+     * 登录成功处理
      *
      * @param request
      * @param response
@@ -56,16 +60,26 @@ public class AuthenticationContextHandler extends SimpleUrlAuthenticationFailure
         LoginUserEntity loginUserEntity = (LoginUserEntity) authentication.getPrincipal();
         String token = tokenService.generateToken(loginUserEntity);
         //存放token到cookie中，最好时直接返回json
-        JwtTokenUtils.setCookieToken(response, token);
-        log.info("登录成功");
+//        JwtTokenUtils.setCookieToken(response, token);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         String jsonString = JSON.toJSONString(ResultUtils.success(token));
+        // token 与 loginUserEntity 记录到redis 中
+
+        redisCacheService.setCacheObject(
+                tokenService.getTokenKey(loginUserEntity.getToken()),
+                loginUserEntity,
+                Constant.TOKEN_EXPIRE_TIME,
+                TimeUnit.SECONDS
+        );
+
+        log.info("用户 {} 登录成功", loginUserEntity.getUsername());
+
         response.getWriter().write(jsonString);
     }
 
     /**
-     * 认证失败处理
+     * 登录失败处理
      *
      * @param request
      * @param response
@@ -75,20 +89,26 @@ public class AuthenticationContextHandler extends SimpleUrlAuthenticationFailure
      */
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+        String username = request.getParameter("username");
+        String message;
         if (exception != null) {
-            log.info("【用户名不存在】" + exception.getMessage());
-            return;
+            message = String.format("用户 %s 不存在", username);
+        } else if (exception instanceof LockedException) {
+            message = String.format("用户 %s 被冻结", username);
+        } else if (exception instanceof BadCredentialsException) {
+            message = "用户名或密码错误";
+        } else {
+            message = "登录验证失败，其他登录失败错误";
         }
-        if (exception instanceof LockedException) {
-            log.info("【用户被冻结】" + exception.getMessage());
-            return;
-        }
-        if (exception instanceof BadCredentialsException) {
-            log.info("【用户名或密码错误】" + exception.getMessage());
-            throw new EOFException();
-        }
-        log.info("-----------登录验证失败，其他登录失败错误");
+        log.error("登录异常：{}", message);
 
+        assert exception != null;
+        log.error("登录异常：{}", exception.getMessage());
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        String jsonString = JSON.toJSONString(ResultUtils.error(message));
+        response.getWriter().write(jsonString);
     }
 
     /**

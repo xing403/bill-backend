@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 public class FastJson2JsonRedisSerializer<T> implements RedisSerializer<T> {
     public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
-    static final Filter AUTO_TYPE_FILTER = JSONReader.autoTypeFilter("");
+    static final Filter AUTO_TYPE_FILTER = JSONReader.autoTypeFilter("vip.ilstudy");
 
     private final Class<T> clazz;
 

@@ -1,15 +1,16 @@
 package vip.ilstudy.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import vip.ilstudy.config.Constant;
 import vip.ilstudy.entity.LoginUserEntity;
+import vip.ilstudy.utils.JwtTokenUtils;
 import vip.ilstudy.utils.UUIDUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class TokenService {
@@ -18,11 +19,11 @@ public class TokenService {
     private String secret;
 
     public String generateToken(LoginUserEntity loginUser) {
-        String token = UUIDUtils.getUUID();
-        loginUser.setToken(token);
+        String userKey = UUIDUtils.getUUID();
+        loginUser.setToken(userKey);
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("login_user_token", token);
+        claims.put(Constant.LOGIN_USER_KEY, userKey);
 
         return createToken(claims);
     }
@@ -34,24 +35,50 @@ public class TokenService {
      * @return 令牌
      */
     public String createToken(Map<String, Object> claims) {
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
-        return token;
     }
 
     /**
-     * 根据 token 获登录用户参数
+     * 从令牌中获取数据声明
      *
-     * @param token
-     * @return
+     * @param token 令牌
+     * @return userKey Map
      */
-    public Claims getClaimsFromToken(String token) {
+    public Claims parseToken(String token) {
         return Jwts.parser()
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
-
     }
+
+    public String getTokenKey(String uuid) {
+        return Constant.LOGIN_TOKEN_KEY + uuid;
+    }
+
+    /**
+     * 校验 token
+     *
+     * @param request
+     */
+    public void verifyToken(HttpServletRequest request) throws Exception {
+        try {
+            String token = JwtTokenUtils.getToken(request);
+            if (StringUtils.hasText(token))
+                parseToken(token);
+        } catch (ExpiredJwtException e) {
+            throw new Exception("Token已过期");
+        } catch (UnsupportedJwtException e) {
+            throw new Exception("不支持的 token 格式");
+        } catch (MalformedJwtException e) {
+            throw new Exception("错误的token 格式");
+        } catch (SignatureException e) {
+            throw new Exception("签名失败");
+        } catch (IllegalArgumentException e) {
+            throw new Exception("非法参数异常");
+        }
+    }
+
 }
