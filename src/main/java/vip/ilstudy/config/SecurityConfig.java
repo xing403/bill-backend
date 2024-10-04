@@ -57,6 +57,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity request) throws Exception {
         return request
                 .csrf(AbstractHttpConfigurer::disable)
+                // 自定义登录处理器
                 .formLogin(formLoginCustomizer -> {
                             formLoginCustomizer
                                     .loginProcessingUrl("/login")
@@ -69,10 +70,7 @@ public class SecurityConfig {
                                     .permitAll();
                         }
                 )
-                .logout(logoutCustomizer ->
-                        // 退出登录成功处理器 logoutSuccess
-                        logoutCustomizer.logoutSuccessHandler(authenticationContextHandler)
-                )
+                .logout(AbstractHttpConfigurer::disable) // 禁用默认退出功能
                 //  基于 token， 不需要 session
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 //  设置 处理鉴权失败、认证失败

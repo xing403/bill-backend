@@ -58,11 +58,18 @@ public class SecurityFilter extends OncePerRequestFilter {
         try {
             tokenService.verifyToken(request);
             LoginUserEntity loginUser = loginUserService.getLoginUser(request);
+
+            if (loginUser == null) {
+                String jsonString = JSON.toJSONString(ResultUtils.error(400, "登录已过期"));
+                ServletUtils.renderString(response, jsonString);
+                return;
+            }
+
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
         } catch (Exception e) {
-            String jsonString = JSON.toJSONString(ResultUtils.error("无权限访问"));
+            String jsonString = JSON.toJSONString(ResultUtils.error(e.getMessage()));
             log.error(jsonString);
             ServletUtils.renderString(response, jsonString);
         }

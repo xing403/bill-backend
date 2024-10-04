@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class AuthenticationContextHandler extends SimpleUrlAuthenticationFailureHandler
-        implements AuthenticationSuccessHandler, LogoutSuccessHandler, AuthenticationEntryPoint, AccessDeniedHandler {
+        implements AuthenticationSuccessHandler, AuthenticationEntryPoint, AccessDeniedHandler {
 
     Logger log = LoggerFactory.getLogger(AuthenticationContextHandler.class);
 
@@ -105,22 +105,6 @@ public class AuthenticationContextHandler extends SimpleUrlAuthenticationFailure
     }
 
     /**
-     * 退出登录处理器
-     *
-     * @param request
-     * @param response
-     * @param authentication
-     * @throws IOException
-     * @throws ServletException
-     */
-    @Override
-    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        SecurityContextHolder.clearContext();
-        JwtTokenUtils.deleteCookieToken(response);
-        response.sendError(500, "未登录");
-    }
-
-    /**
      * 认证失败处理
      *
      * @param request
@@ -130,16 +114,9 @@ public class AuthenticationContextHandler extends SimpleUrlAuthenticationFailure
      * @throws ServletException
      */
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         log.error("[commence][访问 URL({}) 时，没有登录]", request.getRequestURI(), authException);
-        String requestUri = request.getRequestURI();
-        String browser = request.getHeader("user-agent");
-        // 请求login 或者 又admin字段都判断未登录 需要重新登录
-        //        if (isAdminLogin(requestUri) ) {
-        //            JwtTokenUtils.deleteCookieToken(response);
-        //            String token = JwtTokenUtils.getToken(request);
-        //            response.sendRedirect("/xxx/login.html");
-        //        }
+
         response.sendError(500, "未登录");
     }
 
@@ -153,7 +130,7 @@ public class AuthenticationContextHandler extends SimpleUrlAuthenticationFailure
      * @throws ServletException
      */
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
 
         log.warn("[commence][访问 URL({}) 时，用户({}) 权限不够]", request.getRequestURI(), "", accessDeniedException);
         response.sendError(500, "未登录");

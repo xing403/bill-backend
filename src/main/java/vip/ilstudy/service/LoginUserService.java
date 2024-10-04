@@ -13,6 +13,7 @@ import vip.ilstudy.config.Constant;
 import vip.ilstudy.entity.LoginUserEntity;
 import vip.ilstudy.entity.UserEntity;
 import vip.ilstudy.utils.JwtTokenUtils;
+import vip.ilstudy.utils.ServletUtils;
 import vip.ilstudy.utils.StringUtils;
 
 @Service
@@ -67,7 +68,37 @@ public class LoginUserService implements UserDetailsService {
                 String userKey = tokenService.getTokenKey(uuid);
                 return redisCacheService.getCacheObject(userKey);
             } catch (Exception e) {
-                log.error("获取用户信息异常'{}'", e.getMessage());
+                throw new Exception("获取用户信息异常");
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 退出登录
+     *
+     * @return
+     */
+    public Boolean logout() {
+        try {
+            HttpServletRequest request = ServletUtils.getRequest();
+            return logout(request);
+        } catch (Exception e) {
+            log.info("退出登录异常");
+            return false;
+        }
+    }
+
+    public Boolean logout(HttpServletRequest request) throws Exception {
+        String token = JwtTokenUtils.getToken(request);
+        if (StringUtils.isNotEmpty(token)) {
+            try {
+                Claims claims = tokenService.parseToken(token);
+                // 解析对应的权限以及用户信息
+                String uuid = (String) claims.get(Constant.LOGIN_USER_KEY);
+                String userKey = tokenService.getTokenKey(uuid);
+                return redisCacheService.deleteObject(userKey);
+            } catch (Exception e) {
                 throw new Exception("获取用户信息异常");
             }
         }
