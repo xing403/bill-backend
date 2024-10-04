@@ -3,31 +3,34 @@ package vip.ilstudy.config;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.DataPermissionInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.reflection.MetaObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import vip.ilstudy.service.LoginUserService;
 import vip.ilstudy.utils.ServletUtils;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Configuration
 public class MybatisPlusConfig implements MetaObjectHandler {
     /**
-     * 分页插件
+     * mybatis plus 自定义拦截器
      *
      * @return MybatisPlusInterceptor
      */
     @Bean
-    public MybatisPlusInterceptor paginationInterceptor() {
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-
+        // 分页拦截器
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        // 自定义拦截器
+        DataPermissionInterceptor dataPermissionInterceptor = new DataPermissionInterceptor(new MybatisPlusCustomInterceptor());
+        interceptor.addInnerInterceptor(dataPermissionInterceptor);
         return interceptor;
     }
+
 
     @Override
     public void insertFill(MetaObject metaObject) {

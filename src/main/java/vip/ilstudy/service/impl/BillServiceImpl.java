@@ -24,10 +24,7 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, BillEntity> impleme
 
     @Override
     public BillEntity getBillById(Long billId) {
-        QueryWrapper<BillEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("bill_id", billId);
-        queryWrapper.eq("create_by", "admin");
-        return billMapper.selectOne(queryWrapper);
+        return billMapper.selectById(billId);
     }
 
     @Override
@@ -45,17 +42,7 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, BillEntity> impleme
 
     @Override
     public Boolean deleteBillById(Long billId) {
-        QueryWrapper<BillEntity> billEntityQueryWrapper = new QueryWrapper<>();
-        billEntityQueryWrapper.eq("bill_id", billId);
-        LoginUserEntity loginUser = ServletUtils.getLoginUser();
-        if (loginUser != null) {
-            if (!loginUser.isAdmin()) {
-                billEntityQueryWrapper.eq("create_by", loginUser.getUsername());
-            }
-            log.info("{} 删除账单，id:{}", loginUser.getUsername(), billId);
-            return billMapper.delete(billEntityQueryWrapper) > 0;
-        }
-        return false;
+        return billMapper.deleteById(billId) > 0;
 
     }
 }

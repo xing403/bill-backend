@@ -71,7 +71,7 @@ public class LoginUserEntity implements UserDetails {
      */
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return userEntity == null || userEntity.getLocked().equals("0");
     }
 
     /**
@@ -94,7 +94,7 @@ public class LoginUserEntity implements UserDetails {
         return true;
     }
 
-    public Boolean isAdmin(){
-        return username.equals("admin");
+    public Boolean isAdmin() {
+        return username.equals("admin") || userEntity.getIsAdmin().equals("1");
     }
 }
