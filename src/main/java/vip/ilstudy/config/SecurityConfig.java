@@ -84,9 +84,9 @@ public class SecurityConfig {
                                 .accessDeniedHandler(authenticationContextHandler)
                 )
                 .authorizeHttpRequests(authorizeHttpRequest -> authorizeHttpRequest
-                                .requestMatchers("/login", "/register").anonymous()
-                                .requestMatchers("/**").permitAll()
-//                                .anyRequest().authenticated()
+                        .requestMatchers("/login", "/register").anonymous()
+                        .requestMatchers("/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

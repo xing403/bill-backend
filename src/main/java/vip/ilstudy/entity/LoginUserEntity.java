@@ -28,7 +28,6 @@ public class LoginUserEntity implements UserDetails {
     /**
      * 密码
      */
-    @JsonIgnore
     @NotBlank(message = "密码不能为空")
     private String password;
 
@@ -58,7 +57,7 @@ public class LoginUserEntity implements UserDetails {
     /**
      * 账号未过期
      *
-     * @return
+     * @return boolean
      */
     @Override
     public boolean isAccountNonExpired() {
@@ -68,7 +67,7 @@ public class LoginUserEntity implements UserDetails {
     /**
      * 账号未上锁
      *
-     * @return
+     * @return boolean
      */
     @Override
     public boolean isAccountNonLocked() {
@@ -78,7 +77,7 @@ public class LoginUserEntity implements UserDetails {
     /**
      * 证书未过期
      *
-     * @return
+     * @return boolean
      */
     @Override
     public boolean isCredentialsNonExpired() {
@@ -88,7 +87,7 @@ public class LoginUserEntity implements UserDetails {
     /**
      * 已启用
      *
-     * @return
+     * @return boolean
      */
     @Override
     public boolean isEnabled() {
