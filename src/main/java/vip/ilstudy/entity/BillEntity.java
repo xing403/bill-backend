@@ -36,7 +36,7 @@ public class BillEntity extends BaseEntity {
     /**
      * 账单金额
      */
-    @NotBlank(message = "账单金额不能为 空")
+    @NotNull(message = "账单金额不能为空")
     private Double billAmount;
 
     /**
