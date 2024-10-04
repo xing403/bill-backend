@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -20,7 +22,7 @@ public class BaseEntity {
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
-    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
     /**
      * 创建者
@@ -31,7 +33,7 @@ public class BaseEntity {
      * 更新时间
      */
     @TableField(fill = FieldFill.UPDATE)
-    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
     /**
      * 更新者
@@ -52,6 +54,7 @@ public class BaseEntity {
     @JsonIgnore
     @TableField(exist = false)
     private Integer pageNum;
+    
     @JsonIgnore
     @TableField(exist = false)
     private Integer pageSize;
@@ -62,4 +65,11 @@ public class BaseEntity {
     @JsonIgnore
     @TableField(exist = false)
     private Map<String, Object> params;
+
+    public Map<String, Object> getParams() {
+        if (params == null) {
+            params = new HashMap<>();
+        }
+        return params;
+    }
 }

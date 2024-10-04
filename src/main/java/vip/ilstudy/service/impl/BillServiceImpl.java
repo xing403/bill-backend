@@ -18,7 +18,10 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, BillEntity> impleme
 
     @Override
     public BillEntity getBillById(Long billId) {
-        return billMapper.selectById(billId);
+        QueryWrapper<BillEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("bill_id", billId);
+        queryWrapper.eq("create_by", "admin");
+        return billMapper.selectOne(queryWrapper);
     }
 
     @Override

@@ -2,7 +2,6 @@ package vip.ilstudy.service;
 
 
 import io.jsonwebtoken.Claims;
-import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import vip.ilstudy.config.Constant;
 import vip.ilstudy.entity.LoginUserEntity;
 import vip.ilstudy.entity.UserEntity;
 import vip.ilstudy.utils.JwtTokenUtils;
+import vip.ilstudy.utils.StringUtils;
 
 @Service
 public class LoginUserService implements UserDetailsService {

@@ -4,10 +4,10 @@ import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import vip.ilstudy.config.Constant;
 import vip.ilstudy.entity.LoginUserEntity;
 import vip.ilstudy.utils.JwtTokenUtils;
+import vip.ilstudy.utils.StringUtils;
 import vip.ilstudy.utils.UUIDUtils;
 
 import java.util.*;

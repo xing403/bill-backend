@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import vip.ilstudy.config.Constant;
 import vip.ilstudy.entity.LoginUserEntity;
@@ -21,6 +20,7 @@ import vip.ilstudy.service.TokenService;
 import vip.ilstudy.utils.JwtTokenUtils;
 import vip.ilstudy.utils.ResultUtils;
 import vip.ilstudy.utils.ServletUtils;
+import vip.ilstudy.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -58,7 +58,6 @@ public class SecurityFilter extends OncePerRequestFilter {
         try {
             tokenService.verifyToken(request);
             LoginUserEntity loginUser = loginUserService.getLoginUser(request);
-            log.info("用户 {} 登录成功", loginUser.getUsername());
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);

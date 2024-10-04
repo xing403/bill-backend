@@ -26,7 +26,7 @@ public class BillController extends BaseController {
      * @return
      */
     @GetMapping("{billId}")
-    public ResultEntity<BillEntity> getBillById(@PathVariable("billId") Long billId) {
+    public ResultEntity<BillEntity> getBillById(@Valid @PathVariable("billId") Long billId) {
         BillEntity billById = billService.getBillById(billId);
         return ResultUtils.success(billById);
     }
@@ -36,14 +36,8 @@ public class BillController extends BaseController {
      *
      * @return
      */
-    @GetMapping("")
+    @GetMapping("list")
     public ResultEntity<TablePageEntity<BillEntity>> getBillList(@RequestParam("pageNum") Long pageNum, @RequestParam("pageSize") Long pageSize) {
-        if (pageNum == null) {
-            pageNum = 1L;
-        }
-        if (pageSize == null) {
-            pageSize = 10L;
-        }
         IPage<BillEntity> billListPage = billService.getBillListPage(pageNum, pageSize);
 
         return ResultUtils.success(new TablePageEntity<>(billListPage));

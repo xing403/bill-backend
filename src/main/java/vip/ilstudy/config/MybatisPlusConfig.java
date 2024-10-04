@@ -5,8 +5,11 @@ import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.apache.ibatis.reflection.MetaObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import vip.ilstudy.service.LoginUserService;
+import vip.ilstudy.utils.ServletUtils;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -28,15 +31,15 @@ public class MybatisPlusConfig implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
-
+        String username = ServletUtils.getUsername();
         this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, LocalDateTime.now());
-        this.strictInsertFill(metaObject, "createBy", String.class, "default");
-
+        this.strictInsertFill(metaObject, "createBy", String.class, username);
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
+        String username = ServletUtils.getUsername();
         this.setFieldValByName("updateTime", LocalDateTime.now(), metaObject);
-        this.setFieldValByName("updateBy", "default", metaObject);
+        this.setFieldValByName("updateBy", username, metaObject);
     }
 }
