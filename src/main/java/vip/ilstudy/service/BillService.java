@@ -6,9 +6,11 @@ import vip.ilstudy.entity.BillEntity;
 
 
 public interface BillService extends IService<BillEntity> {
-     BillEntity getBillById(Long billId);
+    BillEntity getBillById(Long billId);
 
-     Integer insertBill(BillEntity billEntity);
+    Integer insertBill(BillEntity billEntity);
 
-     IPage<BillEntity> getBillListPage(Long pageNum, Long pageSize);
+    IPage<BillEntity> getBillListPage(Long pageNum, Long pageSize);
+
+    Boolean deleteBillById(Long billId);
 }

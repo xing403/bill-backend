@@ -51,4 +51,12 @@ public class BillController extends BaseController {
         }
         return ResultUtils.error(500, "添加失败");
     }
+
+    @DeleteMapping("{billId}")
+    public ResultEntity<Boolean> deleteBill(@Valid @PathVariable Long billId) {
+        if (billService.deleteBillById(billId)) {
+            return ResultUtils.success();
+        }
+        return ResultUtils.error(500, "添加失败");
+    }
 }

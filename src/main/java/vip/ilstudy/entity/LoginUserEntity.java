@@ -94,4 +94,8 @@ public class LoginUserEntity implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public Boolean isAdmin(){
+        return username.equals("admin");
+    }
 }
