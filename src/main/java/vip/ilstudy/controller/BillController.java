@@ -43,6 +43,19 @@ public class BillController extends BaseController {
         return ResultUtils.success(new TablePageEntity<>(billListPage));
     }
 
+    /**
+     * 查询账单列表
+     *
+     * @return
+     */
+    @PutMapping("")
+    public ResultEntity<Boolean> updateBill(@Valid @RequestBody BillEntity billEntity) {
+        if (billService.updateBillById(billEntity)) {
+            return ResultUtils.success();
+        }
+        return ResultUtils.error(500, "添加失败");
+    }
+
     @PostMapping("")
     public ResultEntity<Boolean> addBill(@Valid @RequestBody BillEntity billEntity) {
         Integer res = billService.insertBill(billEntity);

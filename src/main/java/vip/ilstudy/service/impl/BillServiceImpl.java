@@ -41,8 +41,12 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, BillEntity> impleme
     }
 
     @Override
+    public Boolean updateBillById(BillEntity billEntity) {
+        return billMapper.updateById(billEntity) > 0;
+    }
+
+    @Override
     public Boolean deleteBillById(Long billId) {
         return billMapper.deleteById(billId) > 0;
-
     }
 }

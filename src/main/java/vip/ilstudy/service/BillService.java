@@ -12,5 +12,7 @@ public interface BillService extends IService<BillEntity> {
 
     IPage<BillEntity> getBillListPage(Long pageNum, Long pageSize);
 
+    Boolean updateBillById(BillEntity billEntity);
+
     Boolean deleteBillById(Long billId);
 }
