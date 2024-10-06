@@ -2,9 +2,7 @@ package vip.ilstudy.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import vip.ilstudy.config.Constant;
-import vip.ilstudy.service.TokenService;
+import vip.ilstudy.config.constant.Constant;
 
 
 /**
@@ -12,8 +10,6 @@ import vip.ilstudy.service.TokenService;
  */
 
 public class JwtTokenUtils {
-    @Autowired
-    private TokenService tokenService;
 
     /**
      * 获取请求头中的 token

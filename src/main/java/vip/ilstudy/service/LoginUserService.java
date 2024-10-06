@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import vip.ilstudy.config.Constant;
+import vip.ilstudy.config.constant.Constant;
 import vip.ilstudy.entity.LoginUserEntity;
 import vip.ilstudy.entity.UserEntity;
 import vip.ilstudy.utils.JwtTokenUtils;

@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import vip.ilstudy.config.annotation.Log;
+import vip.ilstudy.config.constant.enums.BusinessType;
 import vip.ilstudy.entity.BillEntity;
 import vip.ilstudy.entity.ResultEntity;
 import vip.ilstudy.entity.TablePageEntity;
@@ -12,9 +14,7 @@ import vip.ilstudy.service.BillService;
 
 @RestController
 @RequestMapping("/bill")
-
 public class BillController extends BaseController {
-    private static final long serialVersionUID = 1L;
 
     @Autowired
     private BillService billService;
@@ -37,6 +37,7 @@ public class BillController extends BaseController {
      * @return
      */
     @GetMapping("list")
+    @Log(title = "查询", businessType = BusinessType.OTHER)
     public ResultEntity<TablePageEntity<BillEntity>> getBillList(@RequestParam("pageNum") Long pageNum, @RequestParam("pageSize") Long pageSize) {
         IPage<BillEntity> billListPage = billService.getBillListPage(pageNum, pageSize);
 
@@ -49,6 +50,7 @@ public class BillController extends BaseController {
      * @return
      */
     @PutMapping("")
+    @Log(title = "更新账单", businessType = BusinessType.UPDATE)
     public ResultEntity<Boolean> updateBill(@Valid @RequestBody BillEntity billEntity) {
         if (billService.updateBillById(billEntity)) {
             return ResultUtils.success();
@@ -57,6 +59,7 @@ public class BillController extends BaseController {
     }
 
     @PostMapping("")
+    @Log(title = "新增账单", businessType = BusinessType.INSERT)
     public ResultEntity<Boolean> addBill(@Valid @RequestBody BillEntity billEntity) {
         Integer res = billService.insertBill(billEntity);
         if (res > 0) {
@@ -66,6 +69,7 @@ public class BillController extends BaseController {
     }
 
     @DeleteMapping("{billId}")
+    @Log(title = "删除账单", businessType = BusinessType.DELETE)
     public ResultEntity<Boolean> deleteBill(@Valid @PathVariable Long billId) {
         if (billService.deleteBillById(billId)) {
             return ResultUtils.success();

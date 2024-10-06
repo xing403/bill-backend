@@ -13,7 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import vip.ilstudy.config.Constant;
+import vip.ilstudy.config.constant.Constant;
 import vip.ilstudy.entity.LoginUserEntity;
 import vip.ilstudy.service.LoginUserService;
 import vip.ilstudy.service.TokenService;

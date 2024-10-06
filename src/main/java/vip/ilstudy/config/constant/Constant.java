@@ -1,4 +1,4 @@
-package vip.ilstudy.config;
+package vip.ilstudy.config.constant;
 
 public class Constant {
     /**
