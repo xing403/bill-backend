@@ -9,8 +9,11 @@ import vip.ilstudy.config.constant.enums.BusinessType;
 import vip.ilstudy.entity.BillEntity;
 import vip.ilstudy.entity.ResultEntity;
 import vip.ilstudy.entity.TablePageEntity;
+import vip.ilstudy.entity.dto.BillStatisticEntity;
 import vip.ilstudy.utils.ResultUtils;
 import vip.ilstudy.service.BillService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/bill")
@@ -75,5 +78,10 @@ public class BillController extends BaseController {
             return ResultUtils.success();
         }
         return ResultUtils.error(500, "添加失败");
+    }
+
+    @GetMapping("statistic")
+    public ResultEntity<List<BillStatisticEntity>> getBillStatistic() {
+        return ResultUtils.success(billService.getBillStatistic());
     }
 }

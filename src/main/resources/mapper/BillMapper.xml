@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vip.ilstudy.mapper.BillMapper">
+
+    <resultMap id="billStatisticEntityMap" type="vip.ilstudy.entity.dto.BillStatisticEntity">
+        <result column="bill_time" property="billTime"/>
+        <result column="bill_income" property="billIncome" jdbcType="DOUBLE"/>
+        <result column="bill_expend" property="billExpend" jdbcType="DOUBLE"/>
+        <result column="bill_income_count" property="billIncomeCount" jdbcType="INTEGER"/>
+        <result column="bill_expend_count" property="billExpendCount" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="getBillStatistic" parameterType="string" resultMap="billStatisticEntityMap">
+        SELECT t.bill_time,
+            SUM(CASE WHEN bill_type = 'income' THEN bill_amount ELSE 0 END) bill_income,
+            SUM(CASE WHEN bill_type = 'expend' THEN bill_amount ELSE 0 END) bill_expend,
+            COUNT(CASE WHEN bill_type = 'income' THEN 1 ELSE NULL END) bill_income_count,
+            COUNT(CASE WHEN bill_type = 'expend' THEN 1 ELSE NULL END) bill_expend_count
+        FROM (
+            SELECT CURDATE() - INTERVAL (a.a + (10 * b.a) + (100 * c.a)) DAY AS `bill_time`
+            FROM
+                (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
+                UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a CROSS JOIN
+                (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
+                UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b CROSS JOIN
+                (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
+                UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) c
+            WHERE CURDATE() - INTERVAL (a.a + (10 * b.a) + (100 * c.a)) DAY
+            > CURDATE() - INTERVAL 1 YEAR
+        ) t
+        LEFT JOIN (
+            SELECT * from x_bill where x_bill.del_flag = 0
+            <if test="username != null"> and x_bill.create_by = #{username}</if>
+        ) b
+        ON t.`bill_time` = b.`bill_time`
+        GROUP BY t.`bill_time`;
+    </select>
+</mapper>

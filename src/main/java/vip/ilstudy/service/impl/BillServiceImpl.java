@@ -9,10 +9,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vip.ilstudy.entity.BillEntity;
-import vip.ilstudy.entity.LoginUserEntity;
+import vip.ilstudy.entity.dto.BillStatisticEntity;
 import vip.ilstudy.mapper.BillMapper;
 import vip.ilstudy.service.BillService;
 import vip.ilstudy.utils.ServletUtils;
+
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class BillServiceImpl extends ServiceImpl<BillMapper, BillEntity> implements BillService {
@@ -48,5 +51,11 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, BillEntity> impleme
     @Override
     public Boolean deleteBillById(Long billId) {
         return billMapper.deleteById(billId) > 0;
+    }
+
+    @Override
+    public List<BillStatisticEntity> getBillStatistic() {
+        String username = Objects.requireNonNull(ServletUtils.getLoginUser()).getUsername();
+        return billMapper.getBillStatistic(username);
     }
 }
