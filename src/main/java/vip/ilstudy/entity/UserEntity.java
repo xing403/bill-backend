@@ -33,6 +33,14 @@ public class UserEntity extends BaseEntity {
     @JsonIgnore
     @NotBlank(message = "密码不能为空")
     private String password;
+    /**
+     * 昵称
+     */
+    private String nickname;
+    /**
+     * 头像
+     */
+    private String avatar;
 
     /**
      * 超级管理员标识
