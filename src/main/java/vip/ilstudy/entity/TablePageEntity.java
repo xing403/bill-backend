@@ -33,4 +33,11 @@ public class TablePageEntity<T> {
         this.setPageSize(page.getSize());
         this.setTotal(page.getTotal());
     }
+
+    public TablePageEntity(List<T> data,Long pageNum,Long pageSize,Long total) {
+        this.setData(data);
+        this.setPageNum(pageNum);
+        this.setPageSize(pageSize);
+        this.setTotal(total);
+    }
 }
