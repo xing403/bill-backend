@@ -1,6 +1,7 @@
 package vip.ilstudy.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,5 +47,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             throw new Exception("用户名不存在" + username);
         }
         return userEntity;
+    }
+
+    @Override
+    public Boolean updateUserLoginTimeByUsername(UserEntity userEntity) {
+        UpdateWrapper<UserEntity> userEntityUpdateWrapper = new UpdateWrapper<>();
+        userEntityUpdateWrapper.eq("username", userEntity.getUsername());
+        return userMapper.update(userEntity, userEntityUpdateWrapper) > 0;
     }
 }

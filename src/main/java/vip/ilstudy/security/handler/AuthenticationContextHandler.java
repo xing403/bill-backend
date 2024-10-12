@@ -19,12 +19,16 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.stereotype.Component;
 import vip.ilstudy.config.constant.Constant;
 import vip.ilstudy.entity.LoginUserEntity;
+import vip.ilstudy.entity.UserEntity;
+import vip.ilstudy.manager.AsyncManager;
+import vip.ilstudy.manager.factory.AsyncFactory;
 import vip.ilstudy.service.RedisCacheService;
 import vip.ilstudy.service.TokenService;
 import vip.ilstudy.utils.ResultUtils;
 import vip.ilstudy.utils.ServletUtils;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -67,6 +71,11 @@ public class AuthenticationContextHandler extends SimpleUrlAuthenticationFailure
                 Constant.TOKEN_EXPIRE_TIME,
                 TimeUnit.SECONDS
         );
+
+
+        UserEntity userEntity = loginUserEntity.getUserEntity();
+        userEntity.setLoginTime(LocalDateTime.now());
+        AsyncManager.me().execute(AsyncFactory.recordLoginInfo(userEntity));
 
         log.info("用户 {} 登录成功", loginUserEntity.getUsername());
 

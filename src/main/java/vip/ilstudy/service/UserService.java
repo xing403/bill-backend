@@ -9,4 +9,6 @@ public interface UserService extends IService<UserEntity> {
     Integer insertUser(LoginUserEntity userEntity);
 
     UserEntity getUserEntityByUsername(String username) throws Exception;
+
+    Boolean updateUserLoginTimeByUsername(UserEntity userEntity);
 }
