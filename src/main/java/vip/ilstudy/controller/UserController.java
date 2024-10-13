@@ -1,8 +1,10 @@
 package vip.ilstudy.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vip.ilstudy.config.constant.Constant;
 import vip.ilstudy.entity.LoginUserEntity;
@@ -38,6 +40,12 @@ public class UserController extends BaseController {
         UserEntity loginUser = loginUserService.getLoginUser(ServletUtils.getRequest()).getUserEntity();
         return ResultUtils.success(loginUser);
     }
+    @GetMapping("list")
+    public ResultEntity<TablePageEntity<UserEntity>> getUserList(@RequestParam("pageNum") Long pageNum, @RequestParam("pageSize") Long pageSize) {
+        IPage<UserEntity> userList = userService.getUserList(pageNum, pageSize);
+        return ResultUtils.success(new TablePageEntity<>(userList));
+    }
+
     @GetMapping("allLoginUser")
     public ResultEntity<TablePageEntity<UserEntity>> getAllLoginUser() {
         Collection<String> keys = redisCacheService.keys(Constant.LOGIN_TOKEN_KEY + "*");

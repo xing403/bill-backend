@@ -60,6 +60,10 @@ public class AuthenticationContextHandler extends SimpleUrlAuthenticationFailure
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         // 组装JWT
         LoginUserEntity loginUserEntity = (LoginUserEntity) authentication.getPrincipal();
+
+        UserEntity userEntity = loginUserEntity.getUserEntity();
+        userEntity.setLoginTime(LocalDateTime.now());
+
         String token = tokenService.generateToken(loginUserEntity);
         //存放token到cookie中，最好时直接返回json
 //        JwtTokenUtils.setCookieToken(response, token);
@@ -73,8 +77,6 @@ public class AuthenticationContextHandler extends SimpleUrlAuthenticationFailure
         );
 
 
-        UserEntity userEntity = loginUserEntity.getUserEntity();
-        userEntity.setLoginTime(LocalDateTime.now());
         AsyncManager.me().execute(AsyncFactory.recordLoginInfo(userEntity));
 
         log.info("用户 {} 登录成功", loginUserEntity.getUsername());

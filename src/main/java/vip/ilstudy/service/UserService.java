@@ -1,5 +1,6 @@
 package vip.ilstudy.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import vip.ilstudy.entity.LoginUserEntity;
 import vip.ilstudy.entity.UserEntity;
@@ -11,4 +12,6 @@ public interface UserService extends IService<UserEntity> {
     UserEntity getUserEntityByUsername(String username) throws Exception;
 
     Boolean updateUserLoginTimeByUsername(UserEntity userEntity);
+
+    IPage<UserEntity> getUserList(Long pageNum, Long pageSize);
 }
