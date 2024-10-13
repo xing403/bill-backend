@@ -52,6 +52,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
     @Override
+    public UserEntity getUserEntityById(Long userId) throws Exception {
+        UserEntity userEntity = userMapper.selectById(userId);
+        if (userEntity == null) {
+            throw new Exception("用户 " + userId + "不存在");
+        }
+        return userEntity;
+    }
+
+    @Override
     public Boolean updateUserLoginTimeByUsername(UserEntity userEntity) {
         UpdateWrapper<UserEntity> userEntityUpdateWrapper = new UpdateWrapper<>();
         userEntityUpdateWrapper.eq("username", userEntity.getUsername());
@@ -61,7 +70,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Override
     public IPage<UserEntity> getUserList(Long pageNum, Long pageSize) {
-        Page<UserEntity> userEntityPage = new Page<>(pageNum,pageSize);
-        return userMapper.selectPage(userEntityPage,null);
+        Page<UserEntity> userEntityPage = new Page<>(pageNum, pageSize);
+        return userMapper.selectPage(userEntityPage, null);
+    }
+
+    @Override
+    public Boolean deleteUserById(Long userId) {
+        return userMapper.deleteById(userId) > 0;
+    }
+
+    @Override
+    public Boolean updateUserByUserName(UserEntity userEntity) {
+        UpdateWrapper<UserEntity> userEntityUpdateWrapper = new UpdateWrapper<>();
+        userEntityUpdateWrapper.eq("username", userEntity.getUsername());
+        return userMapper.update(userEntity, userEntityUpdateWrapper) > 0;
+    }
+
+    @Override
+    public Boolean deleteUserByUsername(String username) {
+        QueryWrapper<UserEntity> userEntityQueryWrapper = new QueryWrapper<>();
+        userEntityQueryWrapper.eq("username", username);
+        return userMapper.delete(userEntityQueryWrapper) > 0;
     }
 }

@@ -10,8 +10,14 @@ public interface UserService extends IService<UserEntity> {
     Integer insertUser(LoginUserEntity userEntity);
 
     UserEntity getUserEntityByUsername(String username) throws Exception;
+    UserEntity getUserEntityById(Long userId) throws Exception;
 
     Boolean updateUserLoginTimeByUsername(UserEntity userEntity);
 
     IPage<UserEntity> getUserList(Long pageNum, Long pageSize);
+
+    Boolean deleteUserById(Long userId);
+    Boolean updateUserByUserName(UserEntity userEntity);
+
+    Boolean deleteUserByUsername(String username);
 }

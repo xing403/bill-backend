@@ -2,10 +2,7 @@ package vip.ilstudy.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import vip.ilstudy.config.constant.Constant;
 import vip.ilstudy.entity.LoginUserEntity;
 import vip.ilstudy.entity.ResultEntity;
@@ -40,10 +37,41 @@ public class UserController extends BaseController {
         UserEntity loginUser = loginUserService.getLoginUser(ServletUtils.getRequest()).getUserEntity();
         return ResultUtils.success(loginUser);
     }
+
+    @GetMapping("information/{id}")
+    public ResultEntity<UserEntity> getUserInformationByUserId(@PathVariable("id") Long userId) throws Exception {
+        UserEntity loginUser = userService.getUserEntityById(userId);
+        return ResultUtils.success(loginUser);
+    }
     @GetMapping("list")
     public ResultEntity<TablePageEntity<UserEntity>> getUserList(@RequestParam("pageNum") Long pageNum, @RequestParam("pageSize") Long pageSize) {
         IPage<UserEntity> userList = userService.getUserList(pageNum, pageSize);
         return ResultUtils.success(new TablePageEntity<>(userList));
+    }
+
+    @PostMapping("")
+    public ResultEntity<Boolean> addUser(@RequestBody LoginUserEntity loginUser) {
+        Integer i = userService.insertUser(loginUser);
+        if(i > 0){
+            return ResultUtils.success();
+        }
+        return ResultUtils.error("添加失败");
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResultEntity<Boolean> deleteUserByUserId(@PathVariable("userId") Long userId) {
+        if(userService.deleteUserById(userId)){
+            return ResultUtils.success();
+        }
+        return ResultUtils.error("删除失败");
+    }
+
+    @PutMapping("")
+    public ResultEntity<Boolean> updateUserByUsername(@RequestBody UserEntity userEntity) {
+        if(userService.updateUserByUserName(userEntity)){
+            return ResultUtils.success();
+        }
+        return ResultUtils.error("更新失败");
     }
 
     @GetMapping("allLoginUser")
