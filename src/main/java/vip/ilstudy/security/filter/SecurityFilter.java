@@ -69,7 +69,7 @@ public class SecurityFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
         } catch (Exception e) {
-            String jsonString = JSON.toJSONString(ResultUtils.error(e.getMessage()));
+            String jsonString = JSON.toJSONString(ResultUtils.error(Arrays.stream(e.getMessage().split(" ")).toList().getLast()));
             log.error(jsonString);
             ServletUtils.renderString(response, jsonString);
         }

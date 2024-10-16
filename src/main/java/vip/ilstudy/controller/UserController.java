@@ -66,6 +66,20 @@ public class UserController extends BaseController {
         return ResultUtils.error("删除失败");
     }
 
+    @GetMapping("/enable/{userId}")
+    public ResultEntity<Boolean> enableUserByUserId(@PathVariable("userId") Long userId) throws Exception {
+        if(userService.enableUserByUserId(userId)){
+            return ResultUtils.success();
+        }
+        return ResultUtils.error("操作失败");
+    }
+    @GetMapping("/disable/{userId}")
+    public ResultEntity<Boolean> disableUserByUserId(@PathVariable("userId") Long userId) throws Exception {
+        if(userService.disableUserByUserId(userId)){
+            return ResultUtils.success();
+        }
+        return ResultUtils.error("操作失败");
+    }
     @PutMapping("")
     public ResultEntity<Boolean> updateUserByUsername(@RequestBody UserEntity userEntity) {
         if(userService.updateUserByUserName(userEntity)){

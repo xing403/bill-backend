@@ -14,6 +14,7 @@ import vip.ilstudy.entity.UserEntity;
 import vip.ilstudy.mapper.UserMapper;
 import vip.ilstudy.service.UserService;
 import vip.ilstudy.utils.SecurityUtils;
+import vip.ilstudy.utils.ServletUtils;
 import vip.ilstudy.utils.UUIDUtils;
 
 @Service
@@ -66,6 +67,43 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userEntityUpdateWrapper.eq("username", userEntity.getUsername());
         userEntityUpdateWrapper.set("login_time", userEntity.getLoginTime());
         return userMapper.update(null, userEntityUpdateWrapper) > 0;
+    }
+
+    @Override
+    public Boolean enableUserByUserId(Long userId) throws Exception {
+        LoginUserEntity loginUser = ServletUtils.getLoginUser();
+        assert loginUser != null;
+        if (loginUser.getUserEntity().getId().equals(userId)) {
+            log.error("不能启动自己");
+            throw new Exception("不能启用自己");
+        }
+        if(!loginUser.isAdmin()){
+            log.error("无权限");
+            throw new Exception("无权限");
+        }
+        UpdateWrapper<UserEntity> userEntityUpdateWrapper = new UpdateWrapper<>();
+        userEntityUpdateWrapper.eq("id", userId);
+        userEntityUpdateWrapper.set("locked", "0");
+        return userMapper.update(userEntityUpdateWrapper) > 0;
+    }
+
+    @Override
+    public Boolean disableUserByUserId(Long userId) throws Exception {
+        LoginUserEntity loginUser = ServletUtils.getLoginUser();
+        UserEntity userEntity = loginUser.getUserEntity();
+        assert userEntity != null;
+        if (userEntity.getId().equals(userId)) {
+            log.error("不能停用自己");
+            throw new Exception("不能停用自己");
+        }
+        if(!loginUser.isAdmin()){
+            log.error("无权限");
+            throw new Exception("无权限");
+        }
+        UpdateWrapper<UserEntity> userEntityUpdateWrapper = new UpdateWrapper<>();
+        userEntityUpdateWrapper.eq("id", userId);
+        userEntityUpdateWrapper.set("locked", "1");
+        return userMapper.update(userEntityUpdateWrapper) > 0;
     }
 
     @Override

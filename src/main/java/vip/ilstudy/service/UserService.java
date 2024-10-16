@@ -14,6 +14,10 @@ public interface UserService extends IService<UserEntity> {
 
     Boolean updateUserLoginTimeByUsername(UserEntity userEntity);
 
+    Boolean enableUserByUserId(Long userId) throws Exception;
+
+    Boolean disableUserByUserId(Long userId) throws Exception;
+
     IPage<UserEntity> getUserList(Long pageNum, Long pageSize);
 
     Boolean deleteUserById(Long userId);
