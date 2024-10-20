@@ -1,6 +1,6 @@
 package vip.ilstudy.entity.dto;
 
-import com.alibaba.fastjson2.JSONObject;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.io.Serial;
@@ -14,6 +14,7 @@ public class SocketMessageEntity implements Serializable {
     /**
      * 发送主题
      */
+    @NotBlank(message = "主题不能为空")
     private String topic;
 
     private String from;
@@ -22,14 +23,7 @@ public class SocketMessageEntity implements Serializable {
     /**
      * 消息内容
      */
+    @NotBlank(message = "消息内容不能为空")
     private String message;
 
-    // 手动映射
-    public static SocketMessageEntity fromJson(String json) {
-        JSONObject parse = JSONObject.parse(json);
-        SocketMessageEntity user = new SocketMessageEntity();
-        user.setTopic(parse.getString("topic"));
-        user.setMessage(parse.getString("message"));
-        return user;
-    }
 }
