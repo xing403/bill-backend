@@ -10,7 +10,6 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,16 +17,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import vip.ilstudy.security.filter.SecurityFilter;
-import vip.ilstudy.security.handler.AuthenticationContextHandler;
+import vip.ilstudy.handler.security.filter.SecurityFilter;
+import vip.ilstudy.handler.security.handler.AuthenticationContextHandler;
 import vip.ilstudy.service.LoginUserService;
 
 @Slf4j
 @Configuration
-@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     @Autowired
@@ -37,7 +32,6 @@ public class SecurityConfig {
     private SecurityFilter securityFilter;
     @Autowired
     private AuthenticationContextHandler authenticationContextHandler;
-
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -55,7 +49,7 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity request) throws Exception {
-        return request
+        request
                 .csrf(AbstractHttpConfigurer::disable)
                 // 自定义登录处理器
                 .formLogin(formLoginCustomizer -> {
@@ -82,12 +76,12 @@ public class SecurityConfig {
                                 .accessDeniedHandler(authenticationContextHandler)
                 )
                 .authorizeHttpRequests(authorizeHttpRequest -> authorizeHttpRequest
-                        .requestMatchers("/login", "/register").anonymous()
-                        .requestMatchers("/**").permitAll()
+                        .requestMatchers("/login", "/register").permitAll()
+                        .requestMatchers("/websocket/**").permitAll() // 允许WebSocket端点
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
+        return request.build();
     }
 
     @Bean
@@ -108,16 +102,5 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    /**
-     * 配置跨源访问(CORS)
-     *
-     * @return
-     */
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
-        return source;
-    }
 
 }

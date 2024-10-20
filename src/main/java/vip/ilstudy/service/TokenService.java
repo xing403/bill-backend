@@ -66,6 +66,27 @@ public class TokenService {
     public void verifyToken(HttpServletRequest request) throws Exception {
         try {
             String token = JwtTokenUtils.getToken(request);
+            verifyToken(token);
+        } catch (ExpiredJwtException e) {
+            throw new Exception("Token已过期");
+        } catch (UnsupportedJwtException e) {
+            throw new Exception("不支持的 token 格式");
+        } catch (MalformedJwtException e) {
+            throw new Exception("错误的token 格式");
+        } catch (SignatureException e) {
+            throw new Exception("签名失败");
+        } catch (IllegalArgumentException e) {
+            throw new Exception("非法参数异常");
+        }
+    }
+
+    /**
+     * 校验 token
+     *
+     * @param token
+     */
+    public void verifyToken(String token) throws Exception {
+        try {
             if (StringUtils.hasText(token))
                 parseToken(token);
         } catch (ExpiredJwtException e) {

@@ -1,4 +1,4 @@
-package vip.ilstudy.security.filter;
+package vip.ilstudy.handler.security.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -39,13 +39,20 @@ public class SecurityFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestUri = request.getRequestURI();
 
-        if (Arrays.asList(Constant.WRITE_PATH).contains(requestUri)) {
-            filterChain.doFilter(request, response);
-            return;
-        } else if (Arrays.asList(Constant.BLACK_PATH).contains(requestUri)) {
-            String jsonString = JSON.toJSONString(ResultUtils.error("无权限访问"));
-            ServletUtils.renderString(response, jsonString);
-            return;
+        log.info("请求 URI {}", requestUri);
+        for (String item : Constant.WRITE_PATH) {
+            if (requestUri.startsWith(item)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+        }
+
+        for (String item : Constant.BLACK_PATH) {
+            if (requestUri.startsWith(item)) {
+                String jsonString = JSON.toJSONString(ResultUtils.error("无权限访问"));
+                ServletUtils.renderString(response, jsonString);
+                return;
+            }
         }
 
         String token = JwtTokenUtils.getToken(request);

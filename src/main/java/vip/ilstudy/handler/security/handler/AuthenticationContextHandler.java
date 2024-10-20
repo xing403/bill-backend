@@ -1,4 +1,4 @@
-package vip.ilstudy.security.handler;
+package vip.ilstudy.handler.security.handler;
 
 import com.alibaba.fastjson.JSON;
 import jakarta.servlet.ServletException;

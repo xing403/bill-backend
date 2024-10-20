@@ -25,4 +25,9 @@ public class Constant {
      * 用户请求token 前缀
      */
     public static final String TOKEN_PREFIX = "Bearer ";
+
+    /**
+     * WebSocket request uri prefix
+     */
+    public static final String WEBSOCKET_REQUEST_PATH_PREFIX = "/websocket";
 }
