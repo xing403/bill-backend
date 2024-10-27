@@ -4,7 +4,7 @@ public class Constant {
     /**
      * 白名单
      */
-    public static String[] WRITE_PATH = {"/login", "/register"};
+    public static String[] WRITE_PATH = {"/login", "/register", "/qrcode"};
     /**
      * 黑名单
      */
@@ -30,4 +30,14 @@ public class Constant {
      * WebSocket request uri prefix
      */
     public static final String WEBSOCKET_REQUEST_PATH_PREFIX = "/websocket";
+
+    /**
+     * 二维码登录 redis key
+     */
+    public static final String QRCODE_LOGIN_KEY = "qrcode_login_key";
+
+    /**
+     * 二维码登录 redis 过期时间
+     */
+    public static final Integer QRCODE_LOGIN_EXPIRE_TIME = 2 * 60;
 }

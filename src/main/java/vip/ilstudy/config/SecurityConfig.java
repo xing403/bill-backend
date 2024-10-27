@@ -78,6 +78,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequest -> authorizeHttpRequest
                         .requestMatchers("/login", "/register").permitAll()
                         .requestMatchers("/websocket/**").permitAll() // 允许WebSocket端点
+                        .requestMatchers("/qrcode/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);

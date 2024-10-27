@@ -123,6 +123,7 @@ public class AuthenticationContextHandler extends SimpleUrlAuthenticationFailure
      */
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
+
         log.error("[commence][访问 URL({}) 时，没有登录]", request.getRequestURI(), authException);
 
         response.sendError(500, "未登录");
