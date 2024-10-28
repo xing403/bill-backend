@@ -1,7 +1,6 @@
 package vip.ilstudy.handler.security.filter;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,12 +39,6 @@ public class SecurityFilter extends OncePerRequestFilter {
         String requestUri = request.getRequestURI();
 
         log.info("请求 URI {}", requestUri);
-        for (String item : Constant.WRITE_PATH) {
-            if (requestUri.startsWith(item)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-        }
 
         for (String item : Constant.BLACK_PATH) {
             if (requestUri.startsWith(item)) {
@@ -56,30 +49,25 @@ public class SecurityFilter extends OncePerRequestFilter {
         }
 
         String token = JwtTokenUtils.getToken(request);
-        if (StringUtils.isEmpty(token)) {
-            log.error("token 为空");
-            String jsonString = JSONObject.toJSONString(ResultUtils.error("未登录"));
-            ServletUtils.renderString(response, jsonString);
-            return;
-        }
-        try {
-            tokenService.verifyToken(request);
-            LoginUserEntity loginUser = loginUserService.getLoginUser(request);
+        if (StringUtils.isNotEmpty(token)) {
+            try {
+                tokenService.verifyToken(request);
+                LoginUserEntity loginUser = loginUserService.getLoginUser(request);
 
-            if (loginUser == null) {
-                String jsonString = JSON.toJSONString(ResultUtils.error(400, "登录已过期"));
+                if (loginUser == null) {
+                    String jsonString = JSON.toJSONString(ResultUtils.error(400, "登录已过期"));
+                    ServletUtils.renderString(response, jsonString);
+                    return;
+                }
+
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (Exception e) {
+                String jsonString = JSON.toJSONString(ResultUtils.error(Arrays.stream(e.getMessage().split(" ")).toList().getLast()));
+                log.error(jsonString);
                 ServletUtils.renderString(response, jsonString);
-                return;
             }
-
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            filterChain.doFilter(request, response);
-        } catch (Exception e) {
-            String jsonString = JSON.toJSONString(ResultUtils.error(Arrays.stream(e.getMessage().split(" ")).toList().getLast()));
-            log.error(jsonString);
-            ServletUtils.renderString(response, jsonString);
         }
-
+        filterChain.doFilter(request, response);
     }
 }

@@ -4,7 +4,7 @@ public class Constant {
     /**
      * 白名单
      */
-    public static String[] WRITE_PATH = {"/login", "/register", "/qrcode"};
+    public static String[] WRITE_PATH = {"/login", "/register", "/qrcode", "/qrcode/{qrcode}/status", "/websocket/**"};
     /**
      * 黑名单
      */

@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import vip.ilstudy.config.constant.Constant;
 import vip.ilstudy.handler.security.filter.SecurityFilter;
 import vip.ilstudy.handler.security.handler.AuthenticationContextHandler;
 import vip.ilstudy.service.LoginUserService;
@@ -76,9 +77,7 @@ public class SecurityConfig {
                                 .accessDeniedHandler(authenticationContextHandler)
                 )
                 .authorizeHttpRequests(authorizeHttpRequest -> authorizeHttpRequest
-                        .requestMatchers("/login", "/register").permitAll()
-                        .requestMatchers("/websocket/**").permitAll() // 允许WebSocket端点
-                        .requestMatchers("/qrcode/**").permitAll()
+                        .requestMatchers(Constant.WRITE_PATH).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
