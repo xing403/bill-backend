@@ -7,6 +7,7 @@ import vip.ilstudy.entity.QRLoginEntity;
 import vip.ilstudy.entity.ResultEntity;
 import vip.ilstudy.service.RedisCacheService;
 import vip.ilstudy.utils.ResultUtils;
+import vip.ilstudy.utils.StringUtils;
 import vip.ilstudy.utils.UUIDUtils;
 
 import java.util.concurrent.TimeUnit;
@@ -54,12 +55,15 @@ public class QRCodeLoginController extends BaseController {
         }
         return ResultUtils.error("二维码已过期");
     }
+
     @GetMapping("/{qrcode}/information")
     public ResultEntity<QRLoginEntity> getQRCodeInformation(@PathVariable("qrcode") String qrcode) {
         if (redisCacheService.hasKey(Constant.QRCODE_LOGIN_KEY + qrcode)) {
             QRLoginEntity qRLoginEntity = redisCacheService.getCacheObject(Constant.QRCODE_LOGIN_KEY + qrcode);
-            redisCacheService.deleteObject(Constant.QRCODE_LOGIN_KEY + qrcode);
-            return ResultUtils.success(qRLoginEntity);
+            if (StringUtils.isNotNull(qRLoginEntity) && qRLoginEntity.getStatus() == QRLoginEntity.Status.SUCCESS) {
+                redisCacheService.deleteObject(Constant.QRCODE_LOGIN_KEY + qrcode);
+                return ResultUtils.success(qRLoginEntity);
+            }
         }
         return ResultUtils.error("二维码已过期");
     }
@@ -68,17 +72,22 @@ public class QRCodeLoginController extends BaseController {
     public ResultEntity<String> changeScannedStatusScanned(@PathVariable("qrcode") String qrcode) {
         if (redisCacheService.hasKey(Constant.QRCODE_LOGIN_KEY + qrcode)) {
             QRLoginEntity qRLoginEntity = redisCacheService.getCacheObject(Constant.QRCODE_LOGIN_KEY + qrcode);
-            qRLoginEntity.setStatus(QRLoginEntity.Status.SCANNED);
-            redisCacheService.setCacheObject(Constant.QRCODE_LOGIN_KEY + qrcode, qRLoginEntity);
-            return ResultUtils.success();
+            if (qRLoginEntity.getStatus() == QRLoginEntity.Status.WAITING) {
+                qRLoginEntity.setStatus(QRLoginEntity.Status.SCANNED);
+                redisCacheService.setCacheObject(Constant.QRCODE_LOGIN_KEY + qrcode, qRLoginEntity);
+                return ResultUtils.success();
+            }
         }
-        return ResultUtils.error("二维码已过期");
+        return ResultUtils.error("二维码已失效");
     }
 
     @PutMapping("/change/{qrcode}/success")
-    public ResultEntity<String> changeScannedStatusSuccess(@PathVariable("qrcode") String qrcode,@RequestBody String token) {
+    public ResultEntity<String> changeScannedStatusSuccess(@PathVariable("qrcode") String qrcode, @RequestBody String token) {
         if (redisCacheService.hasKey(Constant.QRCODE_LOGIN_KEY + qrcode)) {
             QRLoginEntity qRLoginEntity = redisCacheService.getCacheObject(Constant.QRCODE_LOGIN_KEY + qrcode);
+            if (qRLoginEntity.getStatus() != QRLoginEntity.Status.SCANNED) {
+                return ResultUtils.error("二维码状态异常");
+            }
             qRLoginEntity.setStatus(QRLoginEntity.Status.SUCCESS);
             qRLoginEntity.setToken(token);
             redisCacheService.setCacheObject(Constant.QRCODE_LOGIN_KEY + qrcode, qRLoginEntity);
@@ -91,7 +100,12 @@ public class QRCodeLoginController extends BaseController {
     public ResultEntity<String> changeScannedStatusFailed(@PathVariable("qrcode") String qrcode) {
         if (redisCacheService.hasKey(Constant.QRCODE_LOGIN_KEY + qrcode)) {
             QRLoginEntity qRLoginEntity = redisCacheService.getCacheObject(Constant.QRCODE_LOGIN_KEY + qrcode);
-            qRLoginEntity.setStatus(QRLoginEntity.Status.FAILED);
+
+            if (qRLoginEntity.getStatus() != QRLoginEntity.Status.SCANNED) {
+                return ResultUtils.error("二维码状态异常");
+            }
+
+            qRLoginEntity.setStatus(QRLoginEntity.Status.CANCELED);
             redisCacheService.setCacheObject(Constant.QRCODE_LOGIN_KEY + qrcode, qRLoginEntity);
             return ResultUtils.success();
         }

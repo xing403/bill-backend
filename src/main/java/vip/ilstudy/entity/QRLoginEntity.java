@@ -18,6 +18,7 @@ public class QRLoginEntity {
         WAITING, //等待扫码
         SCANNED, //已扫码, 但未确认
         SUCCESS, //已扫描，并确认
+        CANCELED, // 已扫描，但被取消
         FAILED, // 已扫描，但被取消
         EXPIRED // 已过期
     }
